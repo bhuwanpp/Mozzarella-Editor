@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- google font  -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="public/images/logo.png">
+    <title>Mozzarella Editor</title>
+    <!-- for icons  -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    
+  </head>
+  <body class="py-5 ">
+    <!-- header  -->
+    <header class="flex justify-between items-center px-10   border border-red-500">
+      <div class="left">
+        <h2 class="text-3xl">Mozzarella Editor</h2>
+      </div>
+      <div class="right flex items-center gap-10 text-end">        
+        <div class="icons text-5xl cursor-pointer">
+          <iconify-icon icon="line-md:moon-alt-to-sunny-outline-loop-transition"></iconify-icon>
+          <!-- <iconify-icon icon="line-md:sunny-outline-to-moon-alt-loop-transition"></iconify-icon> -->
+        </div>
+        <div class="login text-2xl ">
+          <button >Login</button>
+          <!-- <img src="/images/logo.png" alt="login img" class="w-20 rounded-full cursor-pointer"> -->
+        </div>
+      </div>
+    </header>
+    <!-- nav -->
+    <nav class="flex justify-between px-5 border border-black  mt-2">
+      <div class="left flex  items-center gap-10">
+        <p class="text-xl">index.js</p>
+        <button class="text-3xl" id="add-file">+</button>
+
+
+      </div>
+      <div class="right  mr-10">
+        <button id="run" class="flex items-center gap-1 bg-buttonRed px-2 py-2 rounded-lg text-xl hover:opacity-90">
+          <p>Run</p>
+          <iconify-icon icon="ph:play-fill"></iconify-icon>
+
+        </button>
+      </div>
+      
+    </nav>
+    <!-- main  -->
+
+    <main class="mt-5 flex  border border-black  flex-grow" >
+      <section class="w-3/5 flex gap-5">
+        <div class="lineNuber pt-5 w-5 text-xl pl-3" id="line-numbers">
+        </div>
+        <textarea class="border w-full border-gray-400 h-screen outline-none p-5 bg-editor
+        text-lg" placeholder="Write your js code " id="textarea"></textarea>
+      </section>
+    
+      <!-- aside -->
+      <aside class="w-2/5">
+        <div class="border  border-gray-400 w-full  h-screen outline-none p-5 bg-editor">
+      <p>Output</p>
+      <p id="output" class="bg-[#15161a] mt-2 p-2">Click on RUN button to see the output</p>
+      </div>
+      </aside>
+
+    </main>
+    <!-- footer  -->
+    <footer>
+      
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
