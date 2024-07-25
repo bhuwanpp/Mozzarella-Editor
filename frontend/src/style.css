@@ -4,13 +4,37 @@
 
 *{
     font-family: "Fira Code", monospace;
-
-   
 }
 body{
         /* background: #FFF6E9; */
     background: #282A36;
     color: white;
     overflow: hidden;
+}
 
+.file-button:hover  .rename-button,
+.file-button:hover .delete-button {
+  display: block;
+  transform: scale(1.05); 
+}
+
+.file-button {
+  @apply flex w-40  items-center gap-1 relative;
+}
+
+.rename-button,
+.delete-button {
+  display: none; 
+}
+
+.rename-button {
+  @apply  text-xl mx-2 mt-2;
+}
+
+.delete-button {
+  @apply text-2xl font-bold mt-2;
+}
+
+.white-line{
+    @apply bg-white w-10 h-2 absolute 
 }

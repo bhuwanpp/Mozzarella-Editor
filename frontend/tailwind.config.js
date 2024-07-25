@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       colors:{
         editor:'#282a33',
+        hover_editor: '#24262b',
         buttonRed:"#FF7777"
       }
     },
