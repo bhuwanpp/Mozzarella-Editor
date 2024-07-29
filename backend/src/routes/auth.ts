@@ -9,8 +9,8 @@ router.post("/login", login);
 router.post(
   "/signup",
   validateReqBody(createUserBodySchema),
-  auth,
-  authorize(ROLE.ADMIN),
+  // auth,
+  // authorize(ROLE.ADMIN),
   signup
 );
 router.get("/refresh-token", auth, refresh);

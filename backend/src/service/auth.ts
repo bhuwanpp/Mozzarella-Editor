@@ -45,7 +45,9 @@ export async function login(body: Pick<User, "email" | "password">) {
   const refresthToken = await sign(payload, config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiraryMS,
   });
+  const name = existingUser.name
   return {
+    name,
     accessToken,
     refresthToken,
   };

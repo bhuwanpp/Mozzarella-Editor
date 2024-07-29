@@ -1,53 +1,61 @@
+import { updateHighlighting } from "./highlight";
 import "./style.css";
 
-// Element references
 const addFileBtn = document.getElementById("add-file") as HTMLButtonElement;
-const textArea = document.getElementById("textarea") as HTMLTextAreaElement;
-const output = document.getElementById("output") as HTMLParagraphElement;
-const runBtn = document.getElementById("run") as HTMLButtonElement;
+export const textArea = document.getElementById(
+  "textarea"
+) as HTMLTextAreaElement;
 const lineNumbers = document.getElementById("line-numbers") as HTMLDivElement;
 const filesWrapper = document.getElementById("files") as HTMLDivElement;
 
-// Default file setup
 const defaultFileName = "index.js";
 const defaultFileData =
   '// Your JavaScript code here \nconsole.log("Hello, Mozzarella!")';
 let currentFileName = defaultFileName;
-let fileCounter = 1; // For generating new file names
+let fileCounter = 1;
 
-// Ensure a default file is set in local storage
-localStorage.clear();
+// if not login
+// localStorage.clear();
 localStorage.setItem(defaultFileName, defaultFileData);
 
-// Load files from local storage on page load
 const loadFilesFromStorage = () => {
   for (let i = 0; i < localStorage.length; i++) {
     const fileName = localStorage.key(i);
-    if (fileName) {
+    if (fileName && fileName.endsWith(".js")) {
       createFileButton(fileName);
     }
   }
 };
 
-// Create file button element
 const createFileButton = (fileName: string) => {
   const fileBtn = document.createElement("button");
-  fileBtn.textContent = fileName;
   fileBtn.className = "file-button";
-  fileBtn.addEventListener("click", () => {
-    loadFile(fileName);
-  });
 
-  const renameButton = createRenameButton(fileBtn);
+  const fileNameText = document.createElement("span");
+  fileNameText.className = "file-name";
+  fileNameText.textContent = fileName;
+
+  const buttonWrapper = document.createElement("span");
+  buttonWrapper.className = "button-wrapper";
+  buttonWrapper.style.display = "flex";
+
+  const renameButton = createRenameButton(fileNameText);
   const deleteButton = createDeleteButton(fileBtn);
 
-  fileBtn.appendChild(renameButton);
-  fileBtn.appendChild(deleteButton);
+  buttonWrapper.appendChild(renameButton);
+  buttonWrapper.appendChild(deleteButton);
+
+  fileBtn.appendChild(fileNameText);
+  fileBtn.appendChild(buttonWrapper);
+
+  fileBtn.addEventListener("click", () => {
+    loadFile(fileNameText.textContent);
+    updateHighlighting();
+  });
 
   filesWrapper.insertBefore(fileBtn, addFileBtn);
 };
 
-// Load file content into the text area
 const loadFile = (fileName: string | null) => {
   if (fileName) {
     const fileData = localStorage.getItem(fileName);
@@ -61,12 +69,10 @@ const loadFile = (fileName: string | null) => {
   lineNumbers.style.display = "block";
 };
 
-// Save file content to local storage
 const saveFile = (fileName: string, fileData: string) => {
   localStorage.setItem(fileName, fileData);
 };
 
-// Update line numbers in the editor
 const updateLineNumbers = () => {
   const lines = textArea.value.split("\n").length;
   let lineNumberText = "";
@@ -76,54 +82,6 @@ const updateLineNumbers = () => {
   lineNumbers.textContent = lineNumberText;
 };
 
-// Run code in a sandboxed iframe
-const runCode = () => {
-  const code = textArea.value;
-  output.textContent = "";
-
-  if (code.length === 0) {
-    output.textContent = "Write something first";
-    return;
-  }
-
-  // Create new iframe for code execution
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  document.body.appendChild(iframe);
-
-  const iframeWindow = iframe.contentWindow as Window & { console: Console };
-  const consoleMethods: Array<"log" | "error" | "warn" | "info"> = [
-    "log",
-    "error",
-    "warn",
-    "info",
-  ];
-
-  consoleMethods.forEach((method) => {
-    iframeWindow.console[method] = (...args: any[]) => {
-      output.textContent += args.join(" ") + "\n";
-    };
-  });
-
-  iframeWindow.onerror = (message, source, lineno, colno, error) => {
-    output.textContent += `Error: ${message} (line ${lineno}, column ${colno})\n`;
-    return true;
-  };
-
-  try {
-    const script = iframeWindow.document.createElement("script");
-    script.textContent = code;
-    iframeWindow.document.body.appendChild(script);
-  } catch (e) {
-    output.textContent += `Error: ${
-      e instanceof Error ? e.message : "An unknown error occurred"
-    }\n`;
-  } finally {
-    document.body.removeChild(iframe);
-  }
-};
-
-// Add a new file
 const addFile = () => {
   const fileName = `script${fileCounter}.js`;
   const fileData = '// Your JavaScript code here \nconsole.log("new file")';
@@ -134,37 +92,42 @@ const addFile = () => {
   loadFile(fileName);
 };
 
-// Create rename button
-const createRenameButton = (file: HTMLButtonElement) => {
+const createRenameButton = (fileNameText: HTMLSpanElement) => {
   const renameButton = document.createElement("button");
   renameButton.className = "rename-button";
   renameButton.innerHTML =
     '<iconify-icon icon="solar:pen-bold"></iconify-icon>';
-  renameButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    const newFileName = prompt("Enter a new filename", file.textContent || "");
-    if (newFileName && newFileName !== file.textContent) {
-      const oldFileName = file.textContent!;
-      const fileData = localStorage.getItem(oldFileName);
-      localStorage.removeItem(oldFileName);
-      file.textContent = newFileName;
-      saveFile(newFileName, fileData || "");
-      currentFileName = newFileName;
+  renameButton.addEventListener("click", () => {
+    let newFileName = prompt(
+      "Enter a new filename",
+      fileNameText.textContent || ""
+    );
+    if (newFileName) {
+      if (!newFileName.endsWith(".js")) {
+        newFileName += ".js";
+      }
+      if (newFileName !== fileNameText.textContent) {
+        const oldFileName = fileNameText.textContent!;
+        const fileData = localStorage.getItem(oldFileName);
+        localStorage.removeItem(oldFileName);
+        fileNameText.textContent = newFileName;
+        saveFile(newFileName, fileData || "");
+        currentFileName = newFileName;
+      }
     }
   });
   return renameButton;
 };
 
-// Create delete button
 const createDeleteButton = (file: HTMLButtonElement) => {
   const deleteButton = document.createElement("button");
   deleteButton.className = "delete-button";
   deleteButton.innerHTML =
     '<iconify-icon icon="material-symbols:close"></iconify-icon>';
-  deleteButton.addEventListener("click", (event) => {
-    event.stopPropagation();
+  deleteButton.addEventListener("click", () => {
     if (confirm("Are you sure you want to delete this file?")) {
-      const fileName = file.textContent!;
+      const fileName = (file.querySelector(".file-name") as HTMLSpanElement)
+        .textContent!;
       file.remove();
       localStorage.removeItem(fileName);
 
@@ -199,16 +162,22 @@ const updateCurrentFileAfterDeletion = (deletedFileName: string) => {
   }
 };
 
-// Event listeners
 textArea.addEventListener("input", () => {
   updateLineNumbers();
   saveFile(currentFileName, textArea.value);
 });
 
-runBtn.addEventListener("click", runCode);
 addFileBtn.addEventListener("click", addFile);
 
-// Initialize the editor with files from local storage
 loadFilesFromStorage();
 loadFile(defaultFileName);
 updateLineNumbers();
+
+const lightMode = document.getElementById("light");
+lightMode?.addEventListener("click", () => {
+  document.body.classList.remove("white");
+});
+const darkMode = document.getElementById("dark");
+darkMode?.addEventListener("click", () => {
+  document.body.classList.add("white");
+});

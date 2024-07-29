@@ -8,7 +8,7 @@ import {
 import { ROLE } from "../enums/role";
 import { auth, authorize } from "../middleware/auth";
 import { validateReqParams, validateReqQuery } from "../middleware/validator";
-import { paramSchema } from "../schema/todo";
+import { paramSchema } from "../schema/file";
 import { getUserQuerySchema } from "../schema/user";
 const router = express();
 router.get(

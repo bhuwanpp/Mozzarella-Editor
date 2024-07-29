@@ -6,10 +6,35 @@
     font-family: "Fira Code", monospace;
 }
 body{
-        /* background: #FFF6E9; */
-    background: #282A36;
-    color: white;
-    overflow: hidden;
+  background-color: #282A36;
+  color: white;
+   
+}
+body.white {
+  
+  background: #FFF6E9;
+  color: black;
+}
+
+body.white #light {
+display: block;
+}
+
+body.white #dark {
+display: none;
+}
+body.white .text-area, body.white .output-area, body.white .loginUi, body.white .addFile:hover{
+  background: #FFF6E9;
+  color: black;
+}
+
+body.white .output-show{
+  background:#d1c9be;
+  color: black;
+}
+body.white .addFile:hover{
+  background: #d1c9be;
+  color: black;
 }
 
 .file-button:hover  .rename-button,
@@ -37,4 +62,51 @@ body{
 
 .white-line{
     @apply bg-white w-10 h-2 absolute 
+}
+#textarea, #highlighted-code {
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  tab-size: 4;
+}
+#textarea {
+  color: transparent; 
+  caret-color: white; 
+  position: relative;
+  z-index: 2;
+  word-break:normal;
+  white-space: pre;
+  overflow-x: scroll;
+  min-height: 100vh
+
+}
+body.white #textarea {
+  caret-color: black;
+}
+#highlighted-code {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; 
+  overflow: hidden;
+}
+
+.token.operator {
+  background: none;
+  background-color: transparent !important;
+}
+#suggestions div {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#suggestions div:hover,
+#suggestions .selected {
+  background-color: #3c3f4d;
+}
+#suggestions {
+  position: fixed; 
+}
+.error {
+  background-color: #fdd;
+  border-left: 2px solid red;
 }
