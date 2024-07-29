@@ -10,23 +10,12 @@ import router from "./routes";
 const app = express();
 const limiter = rateLimiter({
   windowMs: 60 * 1000,
-  limit: 20,
+  limit: 100,
   message: "Too many request",
 });
 app.use(helmet());
 app.use(limiter);
-const allowedOrigin = ["https://www.test.com"];
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigin.includes(origin)) {
-        callback(null, origin);
-      } else {
-        callback(new Error("Not allowed"));
-      }
-    },
-  })
-);
+app.use(cors())
 app.use(express.json());
 app.use(requestLogger);
 app.use(router);

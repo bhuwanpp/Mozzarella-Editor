@@ -13,6 +13,7 @@ export function notFoundError(req: Request, res: Response) {
     message: "not found",
   });
 }
+
 export function genericErrorHandler(
   error: Error,
   req: Request,
