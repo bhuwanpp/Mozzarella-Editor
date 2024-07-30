@@ -3,7 +3,7 @@ import {
   deleteUser,
   getUserById,
   getUsers,
-  updateUser,
+  updaePassword,
 } from "../controller/user";
 import { ROLE } from "../enums/role";
 import { auth, authorize } from "../middleware/auth";
@@ -25,13 +25,18 @@ router.get(
   authorize(ROLE.ADMIN),
   getUserById
 );
+// router.put(
+//   "/:updaePassword",
+//   auth,
+//   validateReqParams(paramSchema),
+//   validateReqQuery(getUserQuerySchema),
+//   authorize(ROLE.ADMIN),
+//   updateUser
+// );
 router.put(
-  "/:id",
+  "/",
   auth,
-  validateReqParams(paramSchema),
-  validateReqQuery(getUserQuerySchema),
-  authorize(ROLE.ADMIN),
-  updateUser
+  updaePassword
 );
 router.delete(
   "/:id",

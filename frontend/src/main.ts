@@ -1,183 +1,236 @@
-import { updateHighlighting } from "./highlight";
-import "./style.css";
+import {
+  AfterLoginFunction,
+  loginBackFunction,
+  removeLogin,
+  resetFunction,
+  signupBtnFunctions,
+} from "./auth/authUi";
+import { loginUser, registerUser, updatePasswordFunction } from "./auth/login";
+import { astAutoComplete } from "./editor/autoComplete";
+import { runCode } from "./editor/codeRunner";
+import {
+  addFile,
+  currentFileName,
+  defaultFileName,
+  fetchFilesFromBackend,
+  initializeLocalStorage,
+  loadFile,
+  loadFilesFromStorage,
+  saveFile,
+} from "./editor/fileOperations";
+import { updateLineNumbers } from "./editor/lineNumbers";
+import { resizeTextarea, updateHighlighting } from "./highlight";
+const singnUpBtn = document.getElementById("signupBtn") as HTMLButtonElement;
+const loginBack = document.getElementById("loginback") as HTMLButtonElement;
+export const afterLogin = document.getElementById(
+  "afterLogin"
+) as HTMLButtonElement;
+export const afterLoginUI = document.getElementById(
+  "afterLoginUI"
+) as HTMLButtonElement;
+const logOut = document.getElementById("logOut") as HTMLButtonElement;
 
-const addFileBtn = document.getElementById("add-file") as HTMLButtonElement;
+import "./style.css";
+export const addFileBtn = document.getElementById(
+  "add-file"
+) as HTMLButtonElement;
+export const runBtn = document.getElementById("run") as HTMLButtonElement;
+const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
+const loginUi = document.getElementById("loginUi") as HTMLDivElement;
+export const login = document.getElementById("login") as HTMLInputElement;
+export const signup = document.getElementById("signup") as HTMLInputElement;
+const email = document.getElementById("email") as HTMLInputElement;
+const password = document.getElementById("password") as HTMLInputElement;
+const name = document.getElementById("name") as HTMLInputElement;
+const updatePassword = document.getElementById(
+  "updatePassword"
+) as HTMLButtonElement;
+const updatePasswordForm = document.getElementById(
+  "updatePasswordForm"
+) as HTMLFormElement;
+const updatePasswordBtn = document.getElementById(
+  "updatePasswordBtn"
+) as HTMLButtonElement;
+
 export const textArea = document.getElementById(
   "textarea"
 ) as HTMLTextAreaElement;
-const lineNumbers = document.getElementById("line-numbers") as HTMLDivElement;
-const filesWrapper = document.getElementById("files") as HTMLDivElement;
+export const form = document.getElementById("form") as HTMLFormElement;
+export const loginError = document.getElementById(
+  "loginError"
+) as HTMLParagraphElement;
+const forgotEmail = document.getElementById("forgotEmail") as HTMLInputElement;
+const oldPassword = document.getElementById("oldPassword") as HTMLInputElement;
+const newPassword = document.getElementById("newPassword") as HTMLInputElement;
 
-const defaultFileName = "index.js";
-const defaultFileData =
-  '// Your JavaScript code here \nconsole.log("Hello, Mozzarella!")';
-let currentFileName = defaultFileName;
-let fileCounter = 1;
-
-// if not login
-// localStorage.clear();
-localStorage.setItem(defaultFileName, defaultFileData);
-
-const loadFilesFromStorage = () => {
-  for (let i = 0; i < localStorage.length; i++) {
-    const fileName = localStorage.key(i);
-    if (fileName && fileName.endsWith(".js")) {
-      createFileButton(fileName);
-    }
+// escape  key press
+document.addEventListener("keydown", (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
+    afterLoginUI.style.display = "none";
+    removeLogin();
   }
-};
+});
 
-const createFileButton = (fileName: string) => {
-  const fileBtn = document.createElement("button");
-  fileBtn.className = "file-button";
-
-  const fileNameText = document.createElement("span");
-  fileNameText.className = "file-name";
-  fileNameText.textContent = fileName;
-
-  const buttonWrapper = document.createElement("span");
-  buttonWrapper.className = "button-wrapper";
-  buttonWrapper.style.display = "flex";
-
-  const renameButton = createRenameButton(fileNameText);
-  const deleteButton = createDeleteButton(fileBtn);
-
-  buttonWrapper.appendChild(renameButton);
-  buttonWrapper.appendChild(deleteButton);
-
-  fileBtn.appendChild(fileNameText);
-  fileBtn.appendChild(buttonWrapper);
-
-  fileBtn.addEventListener("click", () => {
-    loadFile(fileNameText.textContent);
-    updateHighlighting();
-  });
-
-  filesWrapper.insertBefore(fileBtn, addFileBtn);
-};
-
-const loadFile = (fileName: string | null) => {
-  if (fileName) {
-    const fileData = localStorage.getItem(fileName);
-    if (fileData) {
-      textArea.value = fileData;
-      updateLineNumbers();
-      currentFileName = fileName;
-    }
+document.addEventListener("click", (event) => {
+  const target = event.target as Node;
+  if (loginUiVisible && !loginUi.contains(target) && target !== loginBtn) {
+    loginUi.style.display = "none";
+    loginUiVisible = false;
   }
-  textArea.style.display = "block";
-  lineNumbers.style.display = "block";
-};
+});
 
-const saveFile = (fileName: string, fileData: string) => {
-  localStorage.setItem(fileName, fileData);
-};
-
-const updateLineNumbers = () => {
-  const lines = textArea.value.split("\n").length;
-  let lineNumberText = "";
-  for (let i = 1; i <= lines; i++) {
-    lineNumberText += `${i}\n`;
-  }
-  lineNumbers.textContent = lineNumberText;
-};
-
-const addFile = () => {
-  const fileName = `script${fileCounter}.js`;
-  const fileData = '// Your JavaScript code here \nconsole.log("new file")';
-
-  saveFile(fileName, fileData);
-  createFileButton(fileName);
-  fileCounter++;
-  loadFile(fileName);
-};
-
-const createRenameButton = (fileNameText: HTMLSpanElement) => {
-  const renameButton = document.createElement("button");
-  renameButton.className = "rename-button";
-  renameButton.innerHTML =
-    '<iconify-icon icon="solar:pen-bold"></iconify-icon>';
-  renameButton.addEventListener("click", () => {
-    let newFileName = prompt(
-      "Enter a new filename",
-      fileNameText.textContent || ""
-    );
-    if (newFileName) {
-      if (!newFileName.endsWith(".js")) {
-        newFileName += ".js";
-      }
-      if (newFileName !== fileNameText.textContent) {
-        const oldFileName = fileNameText.textContent!;
-        const fileData = localStorage.getItem(oldFileName);
-        localStorage.removeItem(oldFileName);
-        fileNameText.textContent = newFileName;
-        saveFile(newFileName, fileData || "");
-        currentFileName = newFileName;
-      }
-    }
-  });
-  return renameButton;
-};
-
-const createDeleteButton = (file: HTMLButtonElement) => {
-  const deleteButton = document.createElement("button");
-  deleteButton.className = "delete-button";
-  deleteButton.innerHTML =
-    '<iconify-icon icon="material-symbols:close"></iconify-icon>';
-  deleteButton.addEventListener("click", () => {
-    if (confirm("Are you sure you want to delete this file?")) {
-      const fileName = (file.querySelector(".file-name") as HTMLSpanElement)
-        .textContent!;
-      file.remove();
-      localStorage.removeItem(fileName);
-
-      updateCurrentFileAfterDeletion(fileName);
-    }
-  });
-  return deleteButton;
-};
-
-const updateCurrentFileAfterDeletion = (deletedFileName: string) => {
-  if (deletedFileName === currentFileName) {
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.endsWith(".js")) {
-        keys.push(key);
-      }
-    }
-
-    if (keys.length > 0) {
-      const lastKey = keys[keys.length - 1];
-      if (lastKey) {
-        loadFile(lastKey);
-      }
-    } else {
-      textArea.value = "";
-      textArea.style.display = "none";
-      lineNumbers.style.display = "none";
-      currentFileName = "";
-      updateLineNumbers();
-    }
-  }
-};
-
+// text area input
 textArea.addEventListener("input", () => {
   updateLineNumbers();
   saveFile(currentFileName, textArea.value);
+  updateHighlighting();
+  resizeTextarea();
 });
 
-addFileBtn.addEventListener("click", addFile);
+// auto complete
+textArea.addEventListener("keydown", (e) => {
+  astAutoComplete(e);
+});
 
+// to run code
+runBtn.addEventListener("click", async () => {
+  await runCode();
+});
+
+textArea.addEventListener("keydown", async (e) => {
+  if (e.ctrlKey && e.key === "Enter") {
+    e.preventDefault();
+    await runCode();
+  }
+});
+
+// add
+addFileBtn.addEventListener("click", addFile);
 loadFilesFromStorage();
 loadFile(defaultFileName);
-updateLineNumbers();
 
+// line number
+updateLineNumbers();
+await fetchFilesFromBackend();
+await initializeLocalStorage();
 const lightMode = document.getElementById("light");
+const darkMode = document.getElementById("dark");
+
+function applyTheme() {
+  const theme = localStorage.getItem("theme");
+  if (theme === "dark") {
+    document.body.classList.add("white");
+  } else {
+    document.body.classList.remove("white");
+  }
+}
+
+// Apply theme on page load
+applyTheme();
+
 lightMode?.addEventListener("click", () => {
   document.body.classList.remove("white");
+  localStorage.setItem("theme", "light");
 });
-const darkMode = document.getElementById("dark");
 darkMode?.addEventListener("click", () => {
   document.body.classList.add("white");
+  localStorage.setItem("theme", "dark");
+});
+
+// log in signup ui
+singnUpBtn?.addEventListener("click", () => {
+  signupBtnFunctions();
+});
+
+loginBack.addEventListener("click", () => {
+  loginBackFunction();
+});
+
+let loginUiVisible = false;
+loginBtn.addEventListener("click", () => {
+  loginUiVisible = !loginUiVisible;
+  loginUi.style.display = loginUiVisible ? "block" : "none";
+  resetFunction();
+});
+
+AfterLoginFunction();
+
+let afterloginVisible = false;
+afterLogin.addEventListener("click", () => {
+  afterloginVisible = !afterloginVisible;
+  afterLoginUI.style.display = afterloginVisible ? "block" : "none";
+});
+
+// log out
+logOut.addEventListener("click", () => {
+  localStorage.removeItem("userCredentials");
+  AfterLoginFunction();
+  initializeLocalStorage();
+});
+//update password
+updatePasswordBtn.addEventListener("click", () => {
+  updatePasswordForm.style.display = "flex";
+});
+document.addEventListener("click", (event) => {
+  const target = event.target as Node;
+  if (!updatePasswordForm.contains(target) && target !== updatePasswordBtn) {
+    updatePasswordForm.style.display = "none";
+  }
+  if (afterloginVisible && !afterLogin.contains(target) && target !== logOut) {
+    afterLoginUI.style.display = "none";
+    afterloginVisible = false;
+  }
+});
+
+// login signup auth
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = {
+    email: email.value,
+    password: password.value,
+  };
+  try {
+    await loginUser(user);
+  } catch (error: any) {
+    console.log(error);
+    loginError.textContent = error.message;
+  }
+});
+// signup user
+signup.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const newUser = {
+    name: name.value,
+    email: email.value,
+    password: password.value,
+  };
+
+  try {
+    await registerUser(newUser);
+  } catch (error) {
+    console.error("Error during sign up:", error);
+  }
+});
+
+// update password
+updatePassword.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const user = {
+    email: forgotEmail.value,
+    oldPassword: oldPassword.value,
+    newPassword: newPassword.value,
+  };
+  try {
+    await updatePasswordFunction(user);
+    forgotEmail.value = "";
+    oldPassword.value = "";
+    newPassword.value = "";
+    updatePasswordForm.style.display = "none";
+    alert("Your password is updated");
+  } catch (error) {
+    console.error("Error during login:", error);
+  }
+  console.log("it click update password");
 });

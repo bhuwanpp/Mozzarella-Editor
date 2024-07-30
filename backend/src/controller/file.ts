@@ -11,8 +11,8 @@ const logger = loggerWithNameSpace("UserController");
  * @param {Response} res - The Express Response object.
  */
 export async function getFile(req: Request, res: Response) {
-  const { userId, role } = req.user!;
-  const data = await fileService.getFiles(userId, role);
+  const { userId } = req.user!;
+  const data = await fileService.getFiles(userId);
   logger.info("Called getFile");
   res.status(HttpStatusCodes.OK).json({ data });
 }
@@ -23,18 +23,18 @@ export async function getFile(req: Request, res: Response) {
  * @param {Response} res - The Express Response object.
  *  @param {next} next - Express nextfunction object
  */
-export async function getFileById(req: Request, res: Response, next: NextFunction) {
-  try {
-    const { id } = req.params;
-    const { userId } = req.user!;
-    const data = await fileService.getFileById(id, userId);
-    logger.info("Called getFielById");
-    res.status(HttpStatusCodes.OK).json({ data });
-  } catch (e) {
-    next(e);
-  }
-}
-
+// export async function getFileById(req: Request, res: Response, next: NextFunction) {
+//   try {
+//     const { id } = req.params;
+//     const { userId } = req.user!;
+//     const data = await fileService.getFileById(id, userId);
+//     logger.info("Called getFielById");
+//     res.status(HttpStatusCodes.OK).json({ data });
+//   } catch (e) {
+//     next(e);
+//   }
+// }
+//
 /**
  * Creates a new task.
  * @param {Request} req - The Express Request object containing the task data in req.body.
@@ -45,7 +45,9 @@ export function createFile(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = req;
     const { userId } = req.user!;
-    fileService.createFile(body, userId);
+
+
+    fileService.createFile(body.fileName, userId, body.fileData);
     logger.info("Called createFile");
     res.status(HttpStatusCodes.OK).json({
       message: "task created ",
@@ -62,16 +64,17 @@ export function createFile(req: Request, res: Response, next: NextFunction) {
  * @param {Response} res - The Express Response object.
  * @param {next} next - Express nextfunction object
  */
-export async function updateFile(req: Request, res: Response, next: NextFunction) {
+export async function renameFile(req: Request, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
-    const { body } = req;
+    const { oldFileName, newFileName } = req.body;
     const { userId } = req.user!;
-    await fileService.updateFile(id, body, userId);
-    logger.info("Called updateFile");
+    await fileService.updateFile(oldFileName, newFileName, userId);
+    logger.info(`File renamed from ${oldFileName} to ${newFileName}`);
+
     res.status(HttpStatusCodes.OK).json({
       message: "task updated",
-      ...body,
+      oldFileName,
+      newFileName
     });
   } catch (e) {
     next(e);
@@ -86,14 +89,12 @@ export async function updateFile(req: Request, res: Response, next: NextFunction
  */
 export async function deleteFile(req: Request, res: Response, next: NextFunction) {
   try {
-    const { id } = req.params;
-    const { body } = req;
+    const { fileName } = req.params;
     const { userId } = req.user!;
-    await fileService.deleteFile(id, userId);
+    await fileService.deleteFile(fileName, userId);
     logger.info("Called deleteFile");
     res.status(HttpStatusCodes.OK).json({
       message: "task deleted",
-      ...body,
     });
   } catch (e) {
     next(e);

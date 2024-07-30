@@ -3,6 +3,8 @@ import ConflictError from "../error/ConflictError";
 import NotFoundError from "../error/NotFoundError";
 import { GetUserQuery, GetUserQueryPage, User } from "../interfaces/user";
 import * as UserModel from "../model/user";
+import { UnauthorizeError } from "../error/UnauthorizedError";
+import bcrypt from 'bcrypt'
 
 /**
  * Creates a new user.
@@ -52,36 +54,20 @@ export function getUserById(id: string) {
   }
   return data;
 }
-/**
- * Updates an existing user's details.
- * @param {string} id - The ID of the user to update.
- * @param {Partial<User>} updatedUser - The updated user object containing new details.
- */
-export async function updateUser(id: string, updatedUser: Partial<User>) {
-  const existingUser = UserModel.UserModel.getUserById(id);
-  if (!existingUser) {
-    throw new NotFoundError(`User with id ${id} does not exist`);
+
+export async function updatePassword(email: string, oldPassword: string, newPassword: string) {
+  const user = await UserModel.UserModel.getUserByEmail(email);
+  if (!user) {
+    throw new NotFoundError(`User with id ${user} does not exist`);
   }
-
-  if (updatedUser.password) {
-    updatedUser.password = await hash(updatedUser.password, 10);
+  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+  if (!isPasswordValid) {
+    throw new UnauthorizeError('Invalid old password');
   }
-
-  // Update user object with new details
-  const updatedUserData = await {
-    ...existingUser,
-    ...updatedUser,
-  };
-
-  // Call the model function to update user
-  const updated = UserModel.UserModel.updateUser(id, updatedUserData);
-
-  if (!updated) {
-    throw new ConflictError(`User ${id} doesnot match `);
-  }
-
-  return updated;
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  await UserModel.UserModel.updateUser(email, hashedNewPassword);
 }
+
 /**
  * Deletes a user by their ID.
  * @param {string} id - The ID of the user to delete.

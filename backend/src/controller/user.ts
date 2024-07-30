@@ -46,25 +46,18 @@ export async function getUserById(
  * @param {Response} res - Express Response object used to send JSON response.
  * @param {next} next - Express nextfunction object
  */
-export function updateUser(
-  req: Request<any, any, Partial<User>>,
+export async function updaePassword(
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { userId } = req.params;
-    const updatedUserData = req.body;
-    const updatedUser = UserService.updateUser(userId, updatedUserData);
-
-    if (updatedUser) {
-      res.status(HttpStatusCodes.OK).json(updatedUser);
-      logger.info("Called update user");
-    } else {
-      res
-        .status(HttpStatusCodes.NOT_FOUND)
-        .json({ error: `User with id ${userId} not found` });
-    }
+    const { email, oldPassword, newPassword } = req.body;
+    await UserService.updatePassword(email, oldPassword, newPassword);
+    res.status(HttpStatusCodes.OK).json("Update user password successful");
+    logger.info("Called update user password");
   } catch (e) {
+    res.status(HttpStatusCodes.BAD_REQUEST).json({ error: e.message });
     next(e);
   }
 }

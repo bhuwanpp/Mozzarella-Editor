@@ -1,6 +1,7 @@
 import io from "socket.io-client";
 import { resizeTextarea, updateHighlighting } from "../highlight";
 import "../style.css";
+
 const socket = io("http://localhost:8080");
 const editor = document.getElementById("textarea") as HTMLTextAreaElement;
 const suggestions = document.getElementById("suggestions") as HTMLDivElement;

@@ -19,6 +19,7 @@ export function updateHighlighting() {
   highlightedCode.scrollTop = textarea.scrollTop;
   highlightedCode.scrollLeft = textarea.scrollLeft;
 }
+
 export function resizeTextarea() {
   textarea.style.height = textarea.scrollHeight + "px";
 }
@@ -27,10 +28,12 @@ textarea.addEventListener("input", () => {
   updateHighlighting();
   resizeTextarea();
 });
+
 textarea.addEventListener("scroll", function () {
   highlightedCode.scrollTop = textarea.scrollTop;
   highlightedCode.scrollLeft = textarea.scrollLeft;
 });
+
 document.addEventListener("DOMContentLoaded", function () {
   updateHighlighting();
 });

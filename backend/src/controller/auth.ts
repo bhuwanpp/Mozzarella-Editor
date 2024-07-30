@@ -49,6 +49,8 @@ export async function signup(req: Request, res: Response) {
  * @param {next} next - Express nextfunction object
  */
 export async function login(req: Request, res: Response, next: NextFunction) {
+  const { body } = req;
+  console.log(body)
   try {
     const { body } = req;
     console.log("controller" + body);
