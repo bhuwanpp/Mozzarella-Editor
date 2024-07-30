@@ -1,7 +1,8 @@
 import { textArea } from "../main";
+
 const output = document.getElementById("output") as HTMLParagraphElement;
-const runBtn = document.getElementById("run") as HTMLButtonElement;
-const runCode = () => {
+
+export const runCode = async () => {
   const code = textArea.value;
   output.textContent = "";
 
@@ -45,5 +46,3 @@ const runCode = () => {
     document.body.removeChild(iframe);
   }
 };
-
-runBtn.addEventListener("click", runCode);

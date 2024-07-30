@@ -1,31 +1,17 @@
 import axios from "axios";
-import { AfterLoginFunction, login, removeLogin, signup } from "./authUi";
-const email = document.getElementById("email") as HTMLInputElement;
-const password = document.getElementById("password") as HTMLInputElement;
-const name = document.getElementById("name") as HTMLInputElement;
+import {
+  fetchFilesFromBackend,
+  getAccessToken,
+} from "../editor/fileOperations";
+import { INewUser, IupdateUser, User } from "../interface/user";
+import { AfterLoginFunction, removeLogin } from "./authUi";
 
-interface User {
-  email: string;
-  password: string;
-}
+const loginError = document.getElementById(
+  "loginError"
+) as HTMLParagraphElement;
 
-login.addEventListener("click", async (e) => {
-  e.preventDefault();
-
-  const user = {
-    email: email.value,
-    password: password.value,
-  };
-  try {
-    await loginUser(user);
-    email.value = "";
-    password.value = "";
-  } catch (error) {
-    console.error("Error during login:", error);
-  }
-});
-
-const loginUser = async (user: User) => {
+// login user
+export const loginUser = async (user: User) => {
   try {
     const response = await axios.post(
       "http://localhost:3000/auth/login",
@@ -38,41 +24,21 @@ const loginUser = async (user: User) => {
     localStorage.setItem("userCredentials", JSON.stringify(userArray));
     AfterLoginFunction();
     removeLogin();
+    fetchFilesFromBackend();
   } catch (error: any) {
     if (error.code === "ECONNABORTED") {
-      console.error("Request timed out");
+      loginError.textContent = "Request timed out";
     } else {
-      console.error(error);
+      loginError.textContent = error.response.data.message;
     }
+    setTimeout(() => {
+      loginError.textContent = "";
+    }, 3000);
   }
 };
 
-signup.addEventListener("click", async (e) => {
-  e.preventDefault();
-  console.log("Sign Up clicked");
-
-  const newUser = {
-    name: name.value,
-    email: email.value,
-    password: password.value,
-  };
-
-  try {
-    await registerUser(newUser);
-    name.value = "";
-    email.value = "";
-    password.value = "";
-  } catch (error) {
-    console.error("Error during sign up:", error);
-  }
-});
-interface INewUser {
-  name: string;
-  email: string;
-  password: string;
-}
 // Register user function
-const registerUser = async (newUser: INewUser) => {
+export const registerUser = async (newUser: INewUser) => {
   try {
     const response = await axios.post(
       "http://localhost:3000/auth/signup",
@@ -80,12 +46,34 @@ const registerUser = async (newUser: INewUser) => {
       { timeout: 10000 }
     );
     const registeredUser = response.data;
+
     console.log("POST: user is registered", registeredUser);
   } catch (error: any) {
     if (error.code === "ECONNABORTED") {
       console.error("Request timed out");
     } else {
-      console.error("Registration error:", error);
+      loginError.textContent = error.response.data.message;
+      setTimeout(() => {
+        loginError.textContent = "";
+      }, 3000);
     }
   }
 };
+
+//update user
+export async function updatePasswordFunction(user: IupdateUser) {
+  const accessToken = getAccessToken();
+  try {
+    const response = await axios.put("http://localhost:3000/users", user, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log("Password updated successfully");
+    return response.data;
+  } catch (error) {
+    console.error("Error updating password:", error);
+    throw error;
+  }
+}

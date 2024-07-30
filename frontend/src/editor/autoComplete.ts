@@ -1,0 +1,43 @@
+import { resizeTextarea, updateHighlighting } from "../highlight";
+import { textArea } from "../main";
+
+export function astAutoComplete(event: any) {
+  const char = event.key;
+
+  if (["(", "{", "[", '"', "'", "`"].includes(char)) {
+    event.preventDefault();
+
+    const cursorPos = textArea.selectionStart;
+
+    const value = textArea.value;
+    let insertText;
+    switch (char) {
+      case "(":
+        insertText = "()";
+        break;
+      case "{":
+        insertText = "{}";
+        break;
+      case "[":
+        console.log("it comes []");
+        insertText = "[]";
+        break;
+      case '"':
+        insertText = '""';
+        break;
+      case "'":
+        insertText = "''";
+        break;
+      case "`":
+        insertText = "``";
+        break;
+    }
+
+    textArea.value =
+      value.substring(0, cursorPos) + insertText + value.substring(cursorPos);
+    updateHighlighting();
+    resizeTextarea();
+
+    textArea.selectionStart = textArea.selectionEnd = cursorPos + 1;
+  }
+}

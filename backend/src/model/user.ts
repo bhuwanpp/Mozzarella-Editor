@@ -13,20 +13,20 @@ export class UserModel extends BaseModel {
     const query = await this.queryBuilder().insert(userToCreate).table("users");
     return query;
   }
-  static async updateUser(id: string, user: User) {
-    const userToUpdate = {
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      role: user.role,
-      updatedAt: new Date(),
-    };
-    const query = this.queryBuilder()
-      .update(userToUpdate)
-      .table("users")
-      .where({ id });
-    await query;
+
+  static async updateUser(email: string, newPassword: string) {
+    try {
+      await this.queryBuilder()
+        .update({ password: newPassword })
+        .table('users')
+        .where({ email });
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw new Error('Unable to update user password');
+    }
+
   }
+
   static getUsers(filter: GetUserQueryPage) {
     const { q } = filter;
     const query = this.queryBuilder()
@@ -48,7 +48,6 @@ export class UserModel extends BaseModel {
     return query;
   }
   static getUserById(userId: string) {
-    console.log('userid' + userId)
     const query = this.queryBuilder()
       .select("*")
       .table("users")
@@ -56,10 +55,8 @@ export class UserModel extends BaseModel {
       .first();
     return query;
   }
-  static getUserByEmail(email: string) {
-    const query = this.queryBuilder().select('userId', 'name', 'email', 'password', 'role').table('users').where({ email }).first()
-
-    console.log(query)
+  static async getUserByEmail(email: string) {
+    const query = await this.queryBuilder().select('userId', 'name', 'email', 'password', 'role').table('users').where({ email }).first()
     return query;
   }
 
