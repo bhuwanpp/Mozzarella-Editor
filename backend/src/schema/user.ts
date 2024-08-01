@@ -60,3 +60,10 @@ export const createUserBodySchema = Joi.object({
 }).options({
   stripUnknown: true,
 });
+export const paramSchema = Joi.object({
+  id: Joi.required().messages({
+    "any.required": "ID is required",
+  }),
+}).options({
+  stripUnknown: true,
+});

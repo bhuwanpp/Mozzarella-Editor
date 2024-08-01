@@ -4,6 +4,7 @@ import { GetUserQuery, User } from "../interfaces/user";
 import * as UserService from "../service/user";
 import loggerWithNameSpace from "../utils/logger";
 const logger = loggerWithNameSpace("UserController");
+
 /**
  * Controller function to get users based on query parameters.
  * @param {Request<any, any, any, GetUserQuery>} req - Express Request object containing query parameters in req.query.
@@ -32,7 +33,6 @@ export async function getUserById(
 ) {
   try {
     const { id } = req.params;
-    console.log(' controller userid' + id)
     const data = await UserService.getUserById(id);
     logger.info("Called getUserById");
     res.status(HttpStatusCodes.OK).json(data);
@@ -40,6 +40,7 @@ export async function getUserById(
     next(e);
   }
 }
+
 /**
  * Controller function to update user details by ID.
  * @param {Request} req - Express Request object containing user ID in req.params and updated user details in req.body.
@@ -61,22 +62,16 @@ export async function updaePassword(
     next(e);
   }
 }
-/**
- * Controller function to delete user by ID.
- * @param {Request} req - Express Request object containing user ID in req.params.
- * @param {Response} res - Express Response object used to send JSON response.
- * @param {next} next - Express nextfunction object
- * @returns {void} - Returns nothing directly but sends JSON response.
- */
-export function deleteUser(
+
+export async function deleteUser(
   req: Request,
   res: Response,
   next: NextFunction
-): void {
+) {
   try {
     const { id } = req.params;
 
-    const deleteResult = UserService.deleteUser(id);
+    const deleteResult = await UserService.deleteUser(id);
 
     if (deleteResult) {
       res

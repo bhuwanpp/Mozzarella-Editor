@@ -3,6 +3,7 @@ import { updateHighlighting } from "../highlight";
 import { addFileBtn, textArea } from "../main";
 import { lineNumbers, updateLineNumbers } from "./lineNumbers";
 const filesWrapper = document.getElementById("files") as HTMLDivElement;
+const whiteLine = document.getElementById("whiteLine") as HTMLParagraphElement;
 
 export const defaultFileName = "index.js";
 const defaultFileData =
@@ -26,6 +27,7 @@ export const initializeLocalStorage = async () => {
     clearJsFilesFromLocalStorage();
     localStorage.setItem(defaultFileName, defaultFileData);
     loadFile(defaultFileName);
+    whiteLine.style.display = "block";
   } else {
     await fetchFilesFromBackend();
   }
@@ -52,7 +54,7 @@ export const loadFilesFromStorage = () => {
     }
   }
 };
-
+// todo if i rename with long file it append after file
 const createFileButton = (fileName: string) => {
   const fileBtn = document.createElement("button");
   fileBtn.className = "file-button";
@@ -75,11 +77,20 @@ const createFileButton = (fileName: string) => {
   fileBtn.appendChild(buttonWrapper);
 
   fileBtn.addEventListener("click", () => {
+    const rect = fileBtn.getBoundingClientRect();
+    const buttonWrapperRect = buttonWrapper.getBoundingClientRect();
+    const fileNameRect = fileNameText.getBoundingClientRect();
+    const renameWidth = `${buttonWrapperRect.width + fileNameRect.width}px`;
+    whiteLine.style.width = renameWidth;
+    whiteLine.style.top = `${rect.bottom - 86}px`;
+    whiteLine.style.left = `${fileNameRect.left - 40}px`;
     loadFile(fileNameText.textContent);
     updateHighlighting();
   });
 
+  filesWrapper.appendChild(fileBtn);
   filesWrapper.insertBefore(fileBtn, addFileBtn);
+  // filesWrapper.style.background = "black";
 };
 
 export const loadFile = (fileName: string | null) => {

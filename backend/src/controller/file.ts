@@ -16,25 +16,12 @@ export async function getFile(req: Request, res: Response) {
   logger.info("Called getFile");
   res.status(HttpStatusCodes.OK).json({ data });
 }
-
-/**
- * Retrieves a task by its ID.
- * @param {Request} req - The Express Request object containing the task ID in req.params.
- * @param {Response} res - The Express Response object.
- *  @param {next} next - Express nextfunction object
- */
-// export async function getFileById(req: Request, res: Response, next: NextFunction) {
-//   try {
-//     const { id } = req.params;
-//     const { userId } = req.user!;
-//     const data = await fileService.getFileById(id, userId);
-//     logger.info("Called getFielById");
-//     res.status(HttpStatusCodes.OK).json({ data });
-//   } catch (e) {
-//     next(e);
-//   }
-// }
-//
+export async function getUserFile(req: Request, res: Response) {
+  const { userId } = req.params!;
+  const data = await fileService.getFiles(userId);
+  logger.info("Called getFile");
+  res.status(HttpStatusCodes.OK).json({ data });
+}
 /**
  * Creates a new task.
  * @param {Request} req - The Express Request object containing the task data in req.body.

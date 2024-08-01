@@ -46,8 +46,10 @@ export async function login(body: Pick<User, "email" | "password">) {
     expiresIn: config.jwt.refreshTokenExpiraryMS,
   });
   const name = existingUser.name
+  const role = existingUser.role
   return {
     name,
+    role,
     accessToken,
     refresthToken,
   };

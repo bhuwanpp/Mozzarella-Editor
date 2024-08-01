@@ -19,7 +19,6 @@ export function astAutoComplete(event: any) {
         insertText = "{}";
         break;
       case "[":
-        console.log("it comes []");
         insertText = "[]";
         break;
       case '"':

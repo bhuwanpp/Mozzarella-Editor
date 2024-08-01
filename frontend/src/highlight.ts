@@ -37,3 +37,22 @@ textarea.addEventListener("scroll", function () {
 document.addEventListener("DOMContentLoaded", function () {
   updateHighlighting();
 });
+
+const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
+const handleSelectionChange = () => {
+  if (document.activeElement === textarea) {
+    const start = textarea.selectionStart;
+    const textBefore = textarea.value.substring(0, start);
+    const linesBefore = textBefore.split("\n");
+    const currentLineNumber = linesBefore.length;
+
+    const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight);
+    const lineTop = (currentLineNumber - 1) * lineHeight;
+
+    highlightDiv.style.top = `${lineTop}px`;
+    highlightDiv.style.height = `${lineHeight}px`;
+  }
+};
+
+document.addEventListener("selectionchange", handleSelectionChange);
+textarea.addEventListener("input", handleSelectionChange);
