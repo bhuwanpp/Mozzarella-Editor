@@ -28,7 +28,7 @@ body.white .text-area, body.white .output-area, body.white .loginUi, body.white 
   color: black;
 }
 
-body.white .output-show{
+body.white .output-show , body.white .lineNumber{
   background:#d1c9be;
   color: black;
 }
@@ -37,29 +37,36 @@ body.white .addFile:hover{
   color: black;
 }
 
+body.white #whiteLine {
+  background: black;
+}
+
 .file-button:hover  .rename-button,
 .file-button:hover .delete-button {
   display: block;
-  transform: scale(1.05); 
 }
+
 
 .file-button {
-  @apply flex w-40  items-center gap-1 relative;
-}
-
-.rename-button,
-.delete-button {
-  display: none; 
+  @apply flex   items-center gap-1 relative;
 }
 
 .rename-button {
-  @apply  text-xl mx-2 mt-2;
+  @apply hidden  text-xl mx-2 mt-2  hover:scale-105 hover:text-blue-300 
 }
 
 .delete-button {
-  @apply text-2xl font-bold mt-2;
+  @apply hidden text-2xl font-bold mt-2  hover:scale-105 hover:text-red-500 
 }
-
+.showUserBtn{
+  @apply text-center px-2 py-1  mt-5 rounded-md text-xl bg-blue-500 cursor-pointer
+}
+.ulUsers{
+  @apply bg-blue-300 hover:opacity-90 py-2  mt-10  cursor-pointer px-3  mr-32  
+}
+.delete-btn{
+  @apply bg-red-400 hover:bg-red-500 rounded-md px-2 py-1  ml-20  absolute right-10  
+}
 .white-line{
     @apply bg-white w-10 h-2 absolute 
 }
@@ -76,11 +83,14 @@ body.white .addFile:hover{
   white-space: pre;
   overflow-x: scroll;
   min-height: 100vh;
-
+  caret-color:white;
+  line-height: 1.5em;
 }
+
 body.white #textarea {
   caret-color: black;
 }
+
 #highlighted-code {
   pointer-events: none;
   position: absolute;
@@ -106,7 +116,50 @@ body.white #textarea {
 #suggestions {
   position: fixed; 
 }
-.error {
+/* .error {
   background-color: #fdd;
   border-left: 2px solid red;
+} */
+
+
+#error-highlight {
+  text-decoration: underline;
+  text-decoration-color: red;
+  text-decoration-style: wavy;
+  position: absolute;
+  pointer-events:  none;
+}
+
+#error-highlight:hover + #errors {
+  display: block;
+}
+
+#error-message {
+  display: none;
+  position: absolute;
+  background-color: #000;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  z-index: 100;
+}
+
+#error-highlight:hover + #error-message {
+  display: block;
+}
+
+.highlight {
+  position: absolute;
+  background: rgba(104, 110, 134, 0.4); 
+  width: 100%;
+  pointer-events: none; 
+}
+
+#textarea::selection {
+  background-color: rgba(104, 110, 134, 0.4); 
+  /* color: black;  */
+}
+.closeBtn{
+  @apply text-3xl  absolute top-0 right-5 text-center hover:scale-110  text-blue-600
 }

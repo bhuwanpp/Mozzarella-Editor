@@ -1,10 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { IFile } from '../interfaces/file';
 
-interface IFile {
-  fileName: string;
-  fileData: string;
-}
+
 
 export class FileModal {
   private static getFilesDir(userId: string): string {

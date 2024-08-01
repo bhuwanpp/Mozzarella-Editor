@@ -17,14 +17,14 @@
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
   </head>
 
-  <body class="py-5 pb-52">
+  <body class="py-5 pb-52 ">
     <!-- header  -->
     <header
       class="flex justify-between items-center px-10 "
     >
-      <div class="left flex items-center gap-5 cursor-pointer">
-        <img src="/images/logo.png" alt="logo" class="w-10 rounded-full" />
-        <h2 class="text-3xl">Mozzarella Editor</h2>
+      <div class="left flex items-center gap-2 cursor-pointer">
+        <img src="/images/logo2.png" alt="logo" class="w-10  rounded-md" />
+        <h2 class="text-4xl">Mozzarella Editor</h2>
       </div>
       <div class="right flex items-center gap-10 text-end">
         <div class="icons text-5xl cursor-pointer">
@@ -93,6 +93,14 @@
         />
         <button type="button" id="updatePassword" class="bg-blue-300 text-black px-2 py-1 rounded-md">Update Password</button>
       </form>
+      
+
+      <!-- show all users  -->
+      <div
+      id="showUsersUI"
+      class="loginUi hidden z-10 absolute top-32 left-72  bg-editor px-5 py-10 border border-white"
+    >
+    </div>
 
       <!-- login ui  -->
       <div
@@ -171,16 +179,20 @@
       </div>
     </header>
     <!-- nav -->
-    <nav class="flex justify-between px-10  mt-2 ">
-      <div class="left flex items-center gap-10 flex-wrap relative" id="files">
-        <button
-          class="addFile text-3xl hover:bg-black p-1 rounded-full"
+    <nav class="flex justify-between px-10  mt-2 relative ">
+      <div class=" files left flex items-center gap-14 flex-wrap relative" id="files">
+       <!-- white line  -->
+          <p id="whiteLine" class="bg-white h-[2px] absolute w-[137px]  top-10"></p>       
+          <button
+          class="addFile text-3xl hover:bg-black p-1 rounded-full  "
           id="add-file"
-        >
+          >
           +
         </button>
-      </div>
-      <div class="right ">
+        </div>
+
+       <div class="right flex gap-10 items-center ">
+ 
         <button
           id="run"
           class="flex items-center gap-1 bg-buttonRed px-2 py-2 rounded-lg text-xl hover:opacity-90"
@@ -192,43 +204,49 @@
     </nav>
     <!-- main  -->
 
-    <main class="mt-5 flex  flex-grow px-5">
-      <section class="w-3/5 flex gap-5 relative">
-        <div class="lineNuber pt-5 w-5 text-md pl-3" id="line-numbers"></div>
+    <main class="mt-5 flex  flex-grow ">
+      <section class="w-3/5 flex  relative">
+        <div class="lineNumber  w-5 text-md  px-5 text-center bg-[#3c3f4d]" id="line-numbers"></div>
         <div class="relative w-full h-full">
+          <div id="highlight" class="highlight"></div>
           <textarea
             id="textarea"
-            class="w-full resize-none h-screen p-4 outline-none text-md bg-transparent border border-gray-400 rounded-md"
+            class="w-full resize-none h-screen  pl-1 outline-none text-md bg-transparent border border-gray-400 rounded-md"
             placeholder="Write your JS code here"
           ></textarea>
           <pre
             id="highlighted-code"
-            class="absolute top-0 left-0 w-full h-full p-4 text-md overflow-hidden"
+            class="absolute top-0 left-0 w-full pl-1 h-full text-md overflow-hidden"
           ></pre>
-        </div>
-        <div
-          id="suggestions"
-          class="suggestion absolute hidden bg-editor text-white border border-white max-h-[200px] overflow-y-auto shadow-sm z-[1000]"
-        ></div>
+
         <!-- error detecion -->
-      </section>
-
-      <!-- aside -->
-      <aside class="w-2/5">
-        <div
-          class="output-area border border-gray-400 w-full h-full outline-none p-5 bg-editor"
-        >
-          <p>Output</p>
-          <p id="output" class="output-show bg-output mt-2 p-2">
-            Click on RUN button to see the output
-          </p>
-        </div>
-      </aside>
+      </div>
+      <div
+      id="suggestions"
+      class="suggestion absolute hidden bg-editor text-white border border-white max-h-[200px] overflow-y-auto shadow-sm z-[1000]"
+      ></div>
+      
+    </section>
+    
+    <!-- aside -->
+    <aside class="w-2/5 relative">
+      <div
+      class="output-area rounded-md border border-gray-400 w-full h-full outline-none p-5 bg-editor"
+      >
+      <p>Output</p>
+      <p id="output" class="output-show bg-output mt-2 p-2">
+        Click on RUN button to see the output
+      </p>
+    </div>
+    <!-- error show  -->
+    <div id="errors" class=" fixed w-[500px] top-5 right-56  py-2
+      hidden text-red-600  bg-editor border border-white px-5 pr-10 z-30">
+     </div>
+  </aside>
     </main>
-    <!-- footer  -->
-    <footer></footer>
 
-    <!-- <script type="module" src="/src/lsp/index.ts"></script> -->
+    <script type="module" src="/src/lsp/errors.ts"></script>
+    <script type="module" src="/src/lsp/suggestion.ts"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

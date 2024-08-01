@@ -30,7 +30,7 @@ export class UserModel extends BaseModel {
   static getUsers(filter: GetUserQueryPage) {
     const { q } = filter;
     const query = this.queryBuilder()
-      .select("userId", "name", "email")
+      .select("userId", "name", "email",)
       .table("users")
       .limit(filter.size)
       .offset((filter.page - 1) * filter.size);
@@ -39,6 +39,7 @@ export class UserModel extends BaseModel {
     }
     return query;
   }
+
   static count(filter: GetUserQueryPage) {
     const { q } = filter;
     const query = this.queryBuilder().count("*").table("users").first();
@@ -47,7 +48,9 @@ export class UserModel extends BaseModel {
     }
     return query;
   }
+
   static getUserById(userId: string) {
+    console.log('userid' + userId)
     const query = this.queryBuilder()
       .select("*")
       .table("users")
@@ -60,8 +63,8 @@ export class UserModel extends BaseModel {
     return query;
   }
 
-  static deleteUser(id: string) {
-    const query = this.queryBuilder().delete().table("users").where({ id });
+  static async deleteUser(userId: string) {
+    const query = await this.queryBuilder().delete().table("users").where({ userId });
     return query;
   }
 }

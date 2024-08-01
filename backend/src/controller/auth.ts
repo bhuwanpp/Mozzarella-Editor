@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 import * as authService from "../service/auth";
@@ -53,7 +54,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   console.log(body)
   try {
     const { body } = req;
-    console.log("controller" + body);
+    console.log("controller", body);
     const data = await authService.login(body);
 
     res.status(HttpStatusCodes.OK).json(data);

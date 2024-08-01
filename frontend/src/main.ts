@@ -5,7 +5,13 @@ import {
   resetFunction,
   signupBtnFunctions,
 } from "./auth/authUi";
-import { loginUser, registerUser, updatePasswordFunction } from "./auth/login";
+import {
+  afterLoginShow,
+  loginUser,
+  registerUser,
+  showAllUsersFunction,
+  updatePasswordFunction,
+} from "./auth/login";
 import { astAutoComplete } from "./editor/autoComplete";
 import { runCode } from "./editor/codeRunner";
 import {
@@ -20,6 +26,7 @@ import {
 } from "./editor/fileOperations";
 import { updateLineNumbers } from "./editor/lineNumbers";
 import { resizeTextarea, updateHighlighting } from "./highlight";
+import { errorsDiv } from "./lsp/errors";
 const singnUpBtn = document.getElementById("signupBtn") as HTMLButtonElement;
 const loginBack = document.getElementById("loginback") as HTMLButtonElement;
 export const afterLogin = document.getElementById(
@@ -30,6 +37,7 @@ export const afterLoginUI = document.getElementById(
 ) as HTMLButtonElement;
 const logOut = document.getElementById("logOut") as HTMLButtonElement;
 
+import Prism from "prismjs";
 import "./style.css";
 export const addFileBtn = document.getElementById(
   "add-file"
@@ -62,11 +70,17 @@ export const loginError = document.getElementById(
 const forgotEmail = document.getElementById("forgotEmail") as HTMLInputElement;
 const oldPassword = document.getElementById("oldPassword") as HTMLInputElement;
 const newPassword = document.getElementById("newPassword") as HTMLInputElement;
+export const showUsersUI = document.getElementById(
+  "showUsersUI"
+) as HTMLDivElement;
 
 // escape  key press
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   if (e.key === "Escape") {
     afterLoginUI.style.display = "none";
+    errorsDiv.style.display = "none";
+    showUsersUI.style.display = "none";
+
     removeLogin();
   }
 });
@@ -76,6 +90,20 @@ document.addEventListener("click", (event) => {
   if (loginUiVisible && !loginUi.contains(target) && target !== loginBtn) {
     loginUi.style.display = "none";
     loginUiVisible = false;
+  }
+  if (!updatePasswordForm.contains(target) && target !== updatePasswordBtn) {
+    updatePasswordForm.style.display = "none";
+  }
+  if (afterloginVisible && !afterLogin.contains(target) && target !== logOut) {
+    afterLoginUI.style.display = "none";
+    afterloginVisible = false;
+  }
+  if (
+    showUsersUI.style.display === "block" &&
+    !showUsersUI.contains(target) &&
+    target !== showAllUsersBtn
+  ) {
+    showUsersUI.style.display = "none";
   }
 });
 
@@ -159,6 +187,7 @@ let afterloginVisible = false;
 afterLogin.addEventListener("click", () => {
   afterloginVisible = !afterloginVisible;
   afterLoginUI.style.display = afterloginVisible ? "block" : "none";
+  afterLoginShow();
 });
 
 // log out
@@ -168,18 +197,19 @@ logOut.addEventListener("click", () => {
   initializeLocalStorage();
 });
 //update password
+
 updatePasswordBtn.addEventListener("click", () => {
   updatePasswordForm.style.display = "flex";
 });
-document.addEventListener("click", (event) => {
-  const target = event.target as Node;
-  if (!updatePasswordForm.contains(target) && target !== updatePasswordBtn) {
-    updatePasswordForm.style.display = "none";
-  }
-  if (afterloginVisible && !afterLogin.contains(target) && target !== logOut) {
-    afterLoginUI.style.display = "none";
-    afterloginVisible = false;
-  }
+
+// show all users
+export const showAllUsersBtn = document.createElement("button");
+showAllUsersBtn.classList.add("showUserBtn");
+showAllUsersBtn.textContent = "Show all users";
+
+showAllUsersBtn.addEventListener("click", async () => {
+  showAllUsersFunction();
+  showUsersUI.style.display = "block";
 });
 
 // login signup auth
@@ -191,6 +221,7 @@ form.addEventListener("submit", async (e) => {
   };
   try {
     await loginUser(user);
+    form.reset();
   } catch (error: any) {
     console.log(error);
     loginError.textContent = error.message;
@@ -208,6 +239,7 @@ signup.addEventListener("click", async (e) => {
 
   try {
     await registerUser(newUser);
+    form.reset();
   } catch (error) {
     console.error("Error during sign up:", error);
   }
@@ -232,5 +264,8 @@ updatePassword.addEventListener("click", async (e) => {
   } catch (error) {
     console.error("Error during login:", error);
   }
-  console.log("it click update password");
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  Prism.highlightAll();
 });

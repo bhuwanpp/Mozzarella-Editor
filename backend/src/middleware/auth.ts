@@ -6,6 +6,9 @@ import { UnauthenticatedError } from "../error/UnauthenticateError";
 import { User } from "../interfaces/user";
 import { ROLE } from "../enums/role";
 import { UnauthorizeError } from "../error/UnauthorizedError";
+import jwt from "jsonwebtoken";
+import { getUserById } from "../service/user";
+import { ApiResponse } from "../utils/apiResponse";
 
 /**
  * Middleware function to authenticate requests using JWT.
@@ -61,3 +64,37 @@ export function authorize(role: ROLE | ROLE[]) {
     next();
   };
 }
+
+
+export const verifyUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log('it comes here')
+  const { authorization } = req.headers;
+  if (!authorization) {
+    next(new UnauthenticatedError("Access token required"));
+    return;
+  }
+  const token = authorization.split(" ");
+  if (token.length !== 2 || token[0] !== "Bearer") {
+    next(new UnauthenticatedError("Invalid access token"));
+    return;
+  }
+  try {
+    console.log('it comes in try block')
+    const playload = jwt.verify(token[1], config.jwt.secret!) as User
+
+    const user = await getUserById(playload.userId)
+    // Check if the user’s role is admin
+    if (user.role.includes(ROLE.ADMIN)) {
+      res.status(200).json(new ApiResponse("Verified", user));
+    } else {
+      next(new UnauthenticatedError("User is not authorized"));
+    }
+  } catch (error) {
+    next(new UnauthenticatedError("Invalid access token"));
+    return;
+  }
+};

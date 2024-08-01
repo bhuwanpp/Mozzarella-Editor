@@ -1,6 +1,7 @@
 import io from "socket.io-client";
 import { resizeTextarea, updateHighlighting } from "../highlight";
 import "../style.css";
+import { errorsDiv } from "./errors";
 
 const socket = io("http://localhost:8080");
 const editor = document.getElementById("textarea") as HTMLTextAreaElement;
@@ -13,7 +14,6 @@ socket.on("connect", () => {
 });
 
 editor.addEventListener("input", () => {
-  const cursorPosition = getCursorPosition(editor);
   const code = editor.value;
 
   updateHighlighting();
@@ -23,7 +23,7 @@ editor.addEventListener("input", () => {
     suggestions.style.display = "none";
     return;
   }
-  socket.emit("requestCompletion", code, cursorPosition);
+  socket.emit("codeUpdate", code);
 });
 
 socket.on("completion", (data) => {
@@ -40,7 +40,6 @@ socket.on("completion", (data) => {
 });
 
 editor.addEventListener("keydown", (e) => {
-  console.log("Key pressed: ", e.key);
   if (suggestions.style.display === "block") {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -56,13 +55,6 @@ editor.addEventListener("keydown", (e) => {
     }
   }
 });
-
-function getCursorPosition(textArea: any) {
-  const lines = textArea.value.substr(0, textArea.selectionStart).split("\n");
-  const line = lines.length;
-  const offset = lines[lines.length - 1].length + 1;
-  return { line, offset };
-}
 
 function showSuggestions(completions: any) {
   if (!Array.isArray(completions)) {
@@ -151,10 +143,20 @@ function applySuggestion(name: string) {
   const newCursorPosition = newValue.length - afterCursor.length;
   editor.setSelectionRange(newCursorPosition, newCursorPosition);
   editor.focus();
+  // Hide suggestions
   suggestions.style.display = "none";
+  currentCompletions = [];
 
   // Update highlighting after applying suggestion
   updateHighlighting();
+
+  // clear error after apply changes
+  clearErrors();
+}
+
+function clearErrors() {
+  errorsDiv.style.display = "none";
+  errorsDiv.innerHTML = "";
 }
 
 editor.addEventListener("input", positionSuggestions);

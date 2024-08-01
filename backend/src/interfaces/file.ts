@@ -1,14 +1,6 @@
-import { ROLE } from "../enums/role";
-
 export interface IFile {
-  filePath: string;
+  fileName: string;
+  fileData: string;
 }
 
-export interface IALLFile extends IFile {
-  id: string;
-  userId: string;
-}
 
-export interface IQueryFile extends IALLFile {
-  role: ROLE
-}
