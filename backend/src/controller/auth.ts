@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 import * as authService from "../service/auth";
@@ -8,12 +7,7 @@ import loggerWithNameSpace from "../utils/logger";
 import HttpStatusCodes from "http-status-codes";
 const logger = loggerWithNameSpace("UserController");
 
-/**
- * Controller function to handle user signup.
- * @param {Request} req - Express Request object containing user information in req.body.
- * @param {Response} res - Express Response object used to send JSON response.
- */
-export async function signup(req: Request, res: Response) {
+export async function signup(req: Request, res: Response, next: NextFunction) {
   const { body } = req;
   const { email, password, role } = body;
   if (role) {
@@ -29,29 +23,22 @@ export async function signup(req: Request, res: Response) {
     });
     return;
   }
-  const data = await authService.signup(body);
-  if (data) {
-    logger.info("Called signup");
-    res.status(HttpStatusCodes.OK).json({
-      message: "user created",
-      ...body,
-    });
-  } else {
-    res.status(HttpStatusCodes.BAD_REQUEST).json({
-      error: "User alredy exists",
-    });
+  try {
+    const data = await authService.signup(body);
+    if (data) {
+      logger.info("Called signup");
+      res.status(HttpStatusCodes.OK).json({
+        message: "user created",
+        ...body,
+      });
+    }
+  } catch (e) {
+    next(e)
   }
+
 }
 
-/**
- * Controller function to handle user login.
- * @param {Request} req - Express Request object containing user credentials in req.body.
- * @param {Response} res - Express Response object used to send JSON response.
- * @param {next} next - Express nextfunction object
- */
 export async function login(req: Request, res: Response, next: NextFunction) {
-  const { body } = req;
-  console.log(body)
   try {
     const { body } = req;
     console.log("controller", body);
@@ -63,11 +50,6 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-/**
- * Refreshes the access token using the provided refresh token.
- * @param {Request} req - The Express request object.
- * @param {Response} res - The Express response object.
- */
 export async function refresh(req: Request, res: Response) {
   const { authorization } = req.headers;
 
@@ -100,6 +82,7 @@ export async function refresh(req: Request, res: Response) {
         name: data.name,
         email: data.email,
       };
+      // create new accessToken
       const accessToken = sign(payload, config.jwt.secret!);
       const refreshToken = token[1];
       logger.info("Called login");

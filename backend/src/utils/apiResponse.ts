@@ -5,6 +5,6 @@ export class ApiResponse {
   constructor(message: string, data?: any) {
     this.message = message;
     this.data = data;
-    this.success = true
+    this.success = true;
   }
 }

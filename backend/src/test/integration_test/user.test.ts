@@ -40,6 +40,7 @@ describe("User Integration test suite", () => {
       expect(response.status).toBe(HttpStatusCodes.OK);
     });
   });
+
   // login test
   describe("Login Api", () => {
     it("should success if credential is  valid  ", async () => {
@@ -69,7 +70,7 @@ describe("User Integration test suite", () => {
       // console.log("new accessToken " + newAccessToken);
     });
   });
-  //
+
   // get users
 
   // Test for getUsers API
@@ -83,6 +84,7 @@ describe("User Integration test suite", () => {
       // console.log(response.body);
     });
   });
+
   // get user by id
   describe("getUserById API Test", async () => {
     it("Should return the user when a valid ID is provided", async () => {
@@ -94,6 +96,7 @@ describe("User Integration test suite", () => {
       expect(response.status).toBe(HttpStatusCodes.OK);
     });
   });
+
   // update user
   describe("updateUser API Test", async () => {
     it("Should update the user when a valid ID and data are provided", async () => {
@@ -111,6 +114,7 @@ describe("User Integration test suite", () => {
       expect(response.status).toBe(HttpStatusCodes.OK);
     });
   });
+
   // delete user id
   describe("deleteUser API Test", () => {
     it("Should delete the user when a valid ID is provided", async () => {

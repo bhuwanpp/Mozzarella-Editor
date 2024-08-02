@@ -163,7 +163,9 @@ export const fetchFilesFromBackend = async () => {
 
       loadFilesFromStorage();
     } catch (error) {
-      console.error("Error fetching files from backend:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log("Token might be expired, attempting to refresh...");
+      }
     }
   } else {
     loadFilesFromStorage();

@@ -5,22 +5,20 @@ import NotFoundError from "../error/NotFoundError";
 import { User } from "../interfaces/user";
 import * as UserModel from "../model/user";
 import * as UserService from "../service/user";
+import ConflictError from "../error/ConflictError";
 
-/**
- * Signs up a new user by hashing their password and creating a user record.
- * @param {User} user - The user object containing user information including password.
- */
 export async function signup(user: User) {
   const password = await bcrypt.hash(user.password, 10);
+  const existingUser = await UserModel.UserModel.getUserByEmail(user.email);
+  if (existingUser) {
+    throw new ConflictError('Email already exists in database');
+  }
   const data = await UserService.createUser({ ...user, password });
   return data;
 }
 
-/**
- * Logs in a user by verifying email and password, and generates access and refresh tokens.
- * @param {Pick<User, "email" | "password">} body - Object containing user's email and password.
- */
 export async function login(body: Pick<User, "email" | "password">) {
+  console.log('it comes in service')
   const existingUser = await UserModel.UserModel.getUserByEmail(body.email);
   console.log("service" + existingUser);
   if (!existingUser) {
@@ -33,6 +31,7 @@ export async function login(body: Pick<User, "email" | "password">) {
   if (!isValidPassword) {
     throw new NotFoundError("Invalid email or  password");
   }
+
   const payload = {
     userId: existingUser.userId,
     name: existingUser.name,
@@ -42,14 +41,16 @@ export async function login(body: Pick<User, "email" | "password">) {
   const accessToken = await sign(payload, config.jwt.secret!, {
     expiresIn: config.jwt.acccessTokenExpiraryMS,
   });
+
   const refresthToken = await sign(payload, config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiraryMS,
   });
-  const name = existingUser.name
-  const role = existingUser.role
+
+  const name = existingUser.name;
+  const roleId = existingUser.roleId;
   return {
     name,
-    role,
+    roleId,
     accessToken,
     refresthToken,
   };

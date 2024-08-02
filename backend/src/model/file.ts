@@ -1,8 +1,6 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { IFile } from '../interfaces/file';
-
-
+import fs from "fs/promises";
+import path from "path";
+import { IFile } from "../interfaces/file";
 
 export class FileModal {
   private static getFilesDir(userId: string): string {
@@ -29,7 +27,7 @@ export class FileModal {
 
     try {
       await fs.access(FILES_DIR);
-      console.log('it comes in try', FILES_DIR)
+      console.log("it comes in try", FILES_DIR);
     } catch {
       // If the directory doesn't exist, return an empty array
       return [];
@@ -39,13 +37,13 @@ export class FileModal {
     const files: IFile[] = [];
 
     for (const fileName of fileNames) {
-      if (fileName.endsWith('.js')) {
+      if (fileName.endsWith(".js")) {
         const filePath = path.join(FILES_DIR, fileName);
-        const fileData = await fs.readFile(filePath, 'utf-8');
+        const fileData = await fs.readFile(filePath, "utf-8");
         files.push({ fileName, fileData });
       }
     }
-    console.log(files)
+    console.log(files);
 
     return files;
   }
@@ -58,13 +56,18 @@ export class FileModal {
       await fs.access(filePath);
       await fs.unlink(filePath);
     } catch (error) {
-      if (error.code === 'ENOENT') {
-        throw new Error('File not found');
+      if (error.code === "ENOENT") {
+        throw new Error("File not found");
       }
       throw error;
     }
   }
-  static async renameFile(oldFileName: string, newFileName: string, userId: string): Promise<void> {
+
+  static async renameFile(
+    oldFileName: string,
+    newFileName: string,
+    userId: string
+  ): Promise<void> {
     const FILES_DIR = this.getFilesDir(userId);
     const oldFilePath = path.join(FILES_DIR, oldFileName);
     const newFilePath = path.join(FILES_DIR, newFileName);
@@ -76,21 +79,20 @@ export class FileModal {
       // Check if the new file name already exists
       try {
         await fs.access(newFilePath);
-        throw new Error('A file with the new name already exists');
+        throw new Error("A file with the new name already exists");
       } catch (error) {
         // If the new file doesn't exist, proceed with renaming
-        if (error.code === 'ENOENT') {
+        if (error.code === "ENOENT") {
           await fs.rename(oldFilePath, newFilePath);
         } else {
           throw error;
         }
       }
     } catch (error) {
-      if (error.code === 'ENOENT') {
-        throw new Error('File not found');
+      if (error.code === "ENOENT") {
+        throw new Error("File not found");
       }
       throw error;
     }
   }
 }
-

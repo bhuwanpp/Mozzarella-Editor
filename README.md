@@ -1,4 +1,4 @@
-## Mozzarella Editor
+# Mozzarella Editor
 
 ### Description
 
@@ -6,20 +6,20 @@ Mozzarella JS aims to provide an advanced online JavaScript code editor and comp
 
 ### Motivation
 
-- let's make own online js code editor to run some js code.
-- while learning the docs we can run code in online to check js features.
+- Develop a custom online JavaScript code editor to run code.
+- Provide a platform for testing and learning JavaScript features interactively.
 
-Features
+### Features
 
 - Code Execution: Run JavaScript code and view the output.
 - Code Editor: Write and edit JavaScript code with real-time syntax highlighting and error reporting.
 - LSP Integration: Auto-completion and error diagnostics using Language Server Protocol.
 - File Management: Create, save, and load files; handle file operations and storage.
-- Theming: Toggle between light and dark modes.
 - User Authentication: Sign up, log in, and manage user sessions.
 - Password Management: Update user passwords securely.
+- Theming: Toggle between light and dark modes.
 
-Technologies Used
+### Technologies Used
 
 1. Frontend:
 
@@ -39,29 +39,31 @@ Technologies Used
 
 Quick Start
 
-1.  without docker
+1.  With Git Clone
 
-    - Clone the project
-    - git clone `git@github.com:bhuwanpp/Mozzarella-Editor.git`
-    - cd Mozzarella-Editor
-    - cd backend
-    - npm install
-    - npm start
-    - and
-    - cd frontend
-    - npm install
-    - npm run dev
+    - Clone the project:\
+      `git clone git@github.com:bhuwanpp/Mozzarella-Editor.git`
+    - Navigate to the project directory:\
+      `cd Mozzarella-Editor`
+    - Set up and start the backend:\
+       `cd backend`\
+      `npm install`\
+      `npm start`
+    - Set up and start the frontend:\
+      ` cd ../frontend`\
+      `npm install`\
+      `npm run dev`
 
-2.  with docker
+2.  With docker
 
-    - clone the project
-    - docker compose up -d
+    - clone the project:\
+      `docker compose up -d`
 
-3.  with docker pull
-    - docker pull bhuwanluffy/mozzarella-ediror
+3.  With docker pull:\
+    `docker pull bhuwanluffy/mozzarella-editor`
 
 ### Contributing
 
-Want to contribute? create a PR.
+Want to contribute? Create a Pull Request!
 
-No time? Then [become a sponsor](https://github.com/sponsors/bhuwanpp)
+No time? [Become a sponsor](https://github.com/sponsors/bhuwanpp) and support the project

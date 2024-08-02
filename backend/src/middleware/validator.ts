@@ -12,6 +12,7 @@ export function validateReqQuery(schema: Schema) {
     next();
   };
 }
+
 export function validateReqBody(schema: Schema) {
   return (req: Request, res: Response, next: NextFunction) => {
     const { error, value } = schema.validate(req.body);
@@ -22,6 +23,7 @@ export function validateReqBody(schema: Schema) {
     next();
   };
 }
+
 export function validateReqParams(schema: Schema) {
   return (req: Request, res: Response, next: NextFunction) => {
     const { error, value } = schema.validate(req.params);

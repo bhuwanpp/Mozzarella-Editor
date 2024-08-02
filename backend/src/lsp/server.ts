@@ -1,9 +1,9 @@
 // server.ts
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import { spawn } from 'child_process';
-import cors from 'cors';
+import { spawn } from "child_process";
+import cors from "cors";
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 
 const app = express();
 app.use(cors());
@@ -11,54 +11,54 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
 });
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
-  const tsServer = spawn('tsserver', ['--stdio']);
-  let buffer = '';
+io.on("connection", (socket) => {
+  console.log("A user connected");
+  const tsServer = spawn("tsserver", ["--stdio"]);
+  let buffer = "";
   let seq = 0;
 
-  tsServer.stdout.on('data', (data) => {
+  tsServer.stdout.on("data", (data) => {
     buffer += data.toString();
     let newlineIndex;
-    while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+    while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
       const message = buffer.slice(0, newlineIndex);
       buffer = buffer.slice(newlineIndex + 1);
 
-      if (message.startsWith('{')) {
+      if (message.startsWith("{")) {
         try {
           const response = JSON.parse(message);
-          if (response.type === 'response') {
-            if (response.command === 'completions' && response.body) {
-              socket.emit('completion', response.body);
-            } else if (response.command === 'semanticDiagnosticsSync') {
-              socket.emit('diagnostics', response.body);
-              console.log('emitting diagnostics', response.body);
+          if (response.type === "response") {
+            if (response.command === "completions" && response.body) {
+              socket.emit("completion", response.body);
+            } else if (response.command === "semanticDiagnosticsSync") {
+              socket.emit("diagnostics", response.body);
+              console.log("emitting diagnostics", response.body);
             }
           }
         } catch (error) {
-          console.error('Error parsing TS server response:', error);
+          console.error("Error parsing TS server response:", error);
         }
       }
     }
   });
 
-  tsServer.stderr.on('data', (data) => {
+  tsServer.stderr.on("data", (data) => {
     console.error(`TypeScript Server Error: ${data}`);
   });
 
-  socket.on('codeUpdate', (code: string) => {
-    console.log('Received code update:', code);
+  socket.on("codeUpdate", (code: string) => {
+    console.log("Received code update:", code);
     sendOpenRequest(tsServer, code);
     sendCompletionRequest(tsServer, code);
     sendDiagnosticsRequest(tsServer);
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
     tsServer.kill();
   });
 
@@ -67,9 +67,13 @@ io.on('connection', (socket) => {
       seq: seq++,
       type: "request",
       command: "open",
-      arguments: { file: "/virtual.ts", fileContent: code, scriptKindName: "TS" }
+      arguments: {
+        file: "/virtual.ts",
+        fileContent: code,
+        scriptKindName: "TS",
+      },
     };
-    tsServer.stdin.write(JSON.stringify(openRequest) + '\n');
+    tsServer.stdin.write(JSON.stringify(openRequest) + "\n");
   }
 
   function sendCompletionRequest(tsServer: any, code: string) {
@@ -81,10 +85,10 @@ io.on('connection', (socket) => {
         file: "/virtual.ts",
         line: 1,
         offset: code.length + 1,
-        prefix: code.split(/\s/).pop() || '',
-      }
+        prefix: code.split(/\s/).pop() || "",
+      },
     };
-    tsServer.stdin.write(JSON.stringify(completionRequest) + '\n');
+    tsServer.stdin.write(JSON.stringify(completionRequest) + "\n");
   }
 
   function sendDiagnosticsRequest(tsServer: any) {
@@ -92,9 +96,9 @@ io.on('connection', (socket) => {
       seq: seq++,
       type: "request",
       command: "semanticDiagnosticsSync",
-      arguments: { file: "/virtual.ts" }
+      arguments: { file: "/virtual.ts" },
     };
-    tsServer.stdin.write(JSON.stringify(diagnosticsRequest) + '\n');
+    tsServer.stdin.write(JSON.stringify(diagnosticsRequest) + "\n");
   }
 });
 

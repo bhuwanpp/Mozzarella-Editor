@@ -7,9 +7,9 @@ import {
 } from "./auth/authUi";
 import {
   afterLoginShow,
+  logOutFunction,
   loginUser,
   registerUser,
-  showAllUsersFunction,
   updatePasswordFunction,
 } from "./auth/login";
 import { astAutoComplete } from "./editor/autoComplete";
@@ -35,9 +35,10 @@ export const afterLogin = document.getElementById(
 export const afterLoginUI = document.getElementById(
   "afterLoginUI"
 ) as HTMLButtonElement;
-const logOut = document.getElementById("logOut") as HTMLButtonElement;
+export const logOut = document.getElementById("logOut") as HTMLButtonElement;
 
 import Prism from "prismjs";
+import { showAllUsersFunction } from "./auth/user";
 import "./style.css";
 export const addFileBtn = document.getElementById(
   "add-file"
@@ -192,10 +193,9 @@ afterLogin.addEventListener("click", () => {
 
 // log out
 logOut.addEventListener("click", () => {
-  localStorage.removeItem("userCredentials");
-  AfterLoginFunction();
-  initializeLocalStorage();
+  logOutFunction();
 });
+
 //update password
 
 updatePasswordBtn.addEventListener("click", () => {
@@ -208,7 +208,7 @@ showAllUsersBtn.classList.add("showUserBtn");
 showAllUsersBtn.textContent = "Show all users";
 
 showAllUsersBtn.addEventListener("click", async () => {
-  showAllUsersFunction();
+  await showAllUsersFunction();
   showUsersUI.style.display = "block";
 });
 

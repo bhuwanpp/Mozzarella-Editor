@@ -4,10 +4,11 @@ import { default as Sinon, default as sinon } from "sinon";
 import { ROLE } from "../../../enums/role";
 import ConflictError from "../../../error/ConflictError";
 import NotFoundError from "../../../error/NotFoundError";
+import { UserModel } from "../../../model/user";
 import { signup } from "../../../service/auth";
 import * as UserService from "../../../service/user";
-import { getUserById, getUsers } from "../../../service/user";
-import { UserModel } from "../../../model/user";
+import { getUserById } from "../../../service/user";
+
 describe("User Service Test Suite", () => {
   // get userbyid unit  test
   describe("getUserById", () => {
@@ -37,6 +38,7 @@ describe("User Service Test Suite", () => {
       expect(response).toStrictEqual(user);
     });
   });
+
   // create user unit test
   describe("createUser", () => {
     let bcryptHashStub: sinon.SinonStub;
