@@ -7,6 +7,7 @@ import {
 import { INewUser, IupdateUser, User } from "../interface/user";
 import { afterLoginUI, showAllUsersBtn } from "../main";
 import { AfterLoginFunction, loginBackFunction, removeLogin } from "./authUi";
+import { onUserLogin, onUserLogout } from "./interceptor";
 
 const loginError = document.getElementById(
   "loginError"
@@ -15,7 +16,8 @@ const loginError = document.getElementById(
 export async function logOutFunction() {
   localStorage.removeItem("userCredentials");
   AfterLoginFunction();
-  initializeLocalStorage();
+  await initializeLocalStorage();
+  onUserLogout();
 }
 
 // login user
@@ -38,6 +40,7 @@ export const loginUser = async (user: User) => {
     AfterLoginFunction();
     removeLogin();
     fetchFilesFromBackend();
+    onUserLogin();
   } catch (error: any) {
     if (error.code === "ECONNABORTED") {
       loginError.textContent = "Request timed out";
@@ -49,6 +52,7 @@ export const loginUser = async (user: User) => {
     }, 3000);
   }
 };
+
 // Function to check if token is expired
 export const isTokenExpired = (): boolean => {
   const userCredentials = localStorage.getItem("userCredentials");
@@ -96,6 +100,9 @@ export async function updatePasswordFunction(user: IupdateUser) {
   } catch (error: any) {
     console.error("Error updating password:", error);
     loginError.textContent = error.response.data.message;
+    setTimeout(() => {
+      loginError.textContent = "";
+    }, 3000);
     throw error;
   }
 }
@@ -123,6 +130,3 @@ export async function afterLoginShow() {
     throw error;
   }
 }
-window.addEventListener("error", function (event) {
-  console.error("Uncaught error:", event.error);
-});

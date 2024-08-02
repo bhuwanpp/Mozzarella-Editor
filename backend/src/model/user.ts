@@ -68,6 +68,15 @@ export class UserModel extends BaseModel {
   }
 
   static async deleteUser(userId: string) {
+    const userToDelete = await this.queryBuilder()
+      .select("role")
+      .table("users")
+      .where({ userId })
+      .first();
+
+    if (userToDelete && userToDelete.role === ROLE.ADMIN) {
+      throw new Error('Cannot delete an admin user');
+    }
     const query = await this.queryBuilder()
       .delete()
       .table("users")

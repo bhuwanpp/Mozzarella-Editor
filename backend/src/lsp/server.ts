@@ -7,11 +7,17 @@ import { Server } from "socket.io";
 
 const app = express();
 app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
+    credentials: true
   },
 });
 
@@ -103,6 +109,6 @@ io.on("connection", (socket) => {
 });
 
 const PORT = 8080;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(` lsp Server running on port ${PORT}`);
 });

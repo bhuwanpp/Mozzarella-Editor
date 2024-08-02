@@ -18,10 +18,8 @@ import {
   addFile,
   currentFileName,
   defaultFileName,
-  fetchFilesFromBackend,
   initializeLocalStorage,
   loadFile,
-  loadFilesFromStorage,
   saveFile,
 } from "./editor/fileOperations";
 import { updateLineNumbers } from "./editor/lineNumbers";
@@ -37,8 +35,8 @@ export const afterLoginUI = document.getElementById(
 ) as HTMLButtonElement;
 export const logOut = document.getElementById("logOut") as HTMLButtonElement;
 
-import Prism from "prismjs";
 import { showAllUsersFunction } from "./auth/user";
+import { suggestions } from "./lsp";
 import "./style.css";
 export const addFileBtn = document.getElementById(
   "add-file"
@@ -74,18 +72,21 @@ const newPassword = document.getElementById("newPassword") as HTMLInputElement;
 export const showUsersUI = document.getElementById(
   "showUsersUI"
 ) as HTMLDivElement;
+export const showAllUsersBtn = document.createElement("button");
 
+let loginUiVisible = false;
+let afterloginVisible = false;
 // escape  key press
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   if (e.key === "Escape") {
     afterLoginUI.style.display = "none";
     errorsDiv.style.display = "none";
     showUsersUI.style.display = "none";
+    suggestions.style.display = "none";
 
     removeLogin();
   }
 });
-
 document.addEventListener("click", (event) => {
   const target = event.target as Node;
   if (loginUiVisible && !loginUi.contains(target) && target !== loginBtn) {
@@ -134,14 +135,6 @@ textArea.addEventListener("keydown", async (e) => {
 });
 
 // add
-addFileBtn.addEventListener("click", addFile);
-loadFilesFromStorage();
-loadFile(defaultFileName);
-
-// line number
-updateLineNumbers();
-await fetchFilesFromBackend();
-await initializeLocalStorage();
 const lightMode = document.getElementById("light");
 const darkMode = document.getElementById("dark");
 
@@ -175,7 +168,6 @@ loginBack.addEventListener("click", () => {
   loginBackFunction();
 });
 
-let loginUiVisible = false;
 loginBtn.addEventListener("click", () => {
   loginUiVisible = !loginUiVisible;
   loginUi.style.display = loginUiVisible ? "block" : "none";
@@ -184,7 +176,6 @@ loginBtn.addEventListener("click", () => {
 
 AfterLoginFunction();
 
-let afterloginVisible = false;
 afterLogin.addEventListener("click", () => {
   afterloginVisible = !afterloginVisible;
   afterLoginUI.style.display = afterloginVisible ? "block" : "none";
@@ -203,7 +194,7 @@ updatePasswordBtn.addEventListener("click", () => {
 });
 
 // show all users
-export const showAllUsersBtn = document.createElement("button");
+
 showAllUsersBtn.classList.add("showUserBtn");
 showAllUsersBtn.textContent = "Show all users";
 
@@ -266,6 +257,7 @@ updatePassword.addEventListener("click", async (e) => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  Prism.highlightAll();
-});
+addFileBtn.addEventListener("click", () => addFile());
+updateLineNumbers();
+initializeLocalStorage();
+loadFile(defaultFileName);

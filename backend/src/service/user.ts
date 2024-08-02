@@ -4,6 +4,7 @@ import { UnauthorizeError } from "../error/UnauthorizedError";
 import { GetUserQueryPage, User } from "../interfaces/user";
 import * as UserModel from "../model/user";
 import ConflictError from "../error/ConflictError";
+import { ForbiddenError } from "../error/ForbiddenError";
 
 export function createUser(user: User) {
   return UserModel.UserModel.createUser(user);
@@ -58,7 +59,14 @@ export async function deleteUser(id: string) {
   if (!existingUser) {
     throw new NotFoundError(`User with id ${id} does not exist`);
   }
-  const deleted = await UserModel.UserModel.deleteUser(id);
+  try {
+    const deleted = await UserModel.UserModel.deleteUser(id);
+    return deleted;
+  } catch (error) {
+    if (error.message === 'Cannot delete an admin user') {
+      throw new ForbiddenError('Cannot delete an admin user');
+    }
+    throw error;
+  }
 
-  return deleted;
 }

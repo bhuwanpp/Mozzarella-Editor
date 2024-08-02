@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../auth/interceptor";
 import { updateHighlighting } from "../highlight";
 import { addFileBtn, textArea } from "../main";
 import { lineNumbers, updateLineNumbers } from "./lineNumbers";
@@ -22,17 +23,15 @@ export const getAccessToken = (): string | null => {
 
 export const initializeLocalStorage = async () => {
   const accessToken = getAccessToken();
-
   if (!accessToken) {
     clearJsFilesFromLocalStorage();
     localStorage.setItem(defaultFileName, defaultFileData);
     loadFile(defaultFileName);
     whiteLine.style.display = "block";
-  } else {
-    await fetchFilesFromBackend();
+    whiteLine.style.left = "0px";
+    updateHighlighting();
   }
-
-  loadFilesFromStorage();
+  await loadAndDisplayFiles();
 };
 
 export const clearJsFilesFromLocalStorage = () => {
@@ -44,17 +43,44 @@ export const clearJsFilesFromLocalStorage = () => {
   }
 };
 
-export const loadFilesFromStorage = () => {
-  const fileButtons = filesWrapper.querySelectorAll(".file-button");
-  fileButtons.forEach((button) => button.remove());
-  for (let i = 0; i < localStorage.length; i++) {
-    const fileName = localStorage.key(i);
-    if (fileName && fileName.endsWith(".js")) {
-      createFileButton(fileName);
+export const loadAndDisplayFiles = async () => {
+  filesWrapper
+    .querySelectorAll(".file-button")
+    .forEach((button) => button.remove());
+
+  const accessToken = getAccessToken();
+  if (accessToken) {
+    try {
+      const response = await api.get("http://localhost:3000/files", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      clearJsFilesFromLocalStorage();
+      if (Array.isArray(response.data.data)) {
+        response.data.data.forEach(
+          (file: { fileName: string; fileData: string }) => {
+            localStorage.setItem(file.fileName, file.fileData);
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching files:", error);
     }
   }
+
+  const jsFiles = Object.keys(localStorage).filter((key) =>
+    key.endsWith(".js")
+  );
+  jsFiles.forEach(createFileButton);
+
+  if (jsFiles.length > 0) {
+    loadFile(jsFiles[0]);
+  } else {
+    textArea.value = "";
+    updateLineNumbers();
+  }
+  updateHighlighting();
 };
-// todo if i rename with long file it append after file
+
 const createFileButton = (fileName: string) => {
   const fileBtn = document.createElement("button");
   fileBtn.className = "file-button";
@@ -77,20 +103,25 @@ const createFileButton = (fileName: string) => {
   fileBtn.appendChild(buttonWrapper);
 
   fileBtn.addEventListener("click", () => {
-    const rect = fileBtn.getBoundingClientRect();
-    const buttonWrapperRect = buttonWrapper.getBoundingClientRect();
-    const fileNameRect = fileNameText.getBoundingClientRect();
-    const renameWidth = `${buttonWrapperRect.width + fileNameRect.width}px`;
-    whiteLine.style.width = renameWidth;
-    whiteLine.style.top = `${rect.bottom - 86}px`;
-    whiteLine.style.left = `${fileNameRect.left - 40}px`;
+    updateWhiteLinePosition(fileBtn, buttonWrapper, fileNameText);
     loadFile(fileNameText.textContent);
     updateHighlighting();
   });
 
-  filesWrapper.appendChild(fileBtn);
   filesWrapper.insertBefore(fileBtn, addFileBtn);
-  // filesWrapper.style.background = "black";
+};
+
+const updateWhiteLinePosition = (
+  fileBtn: HTMLButtonElement,
+  buttonWrapper: HTMLSpanElement,
+  fileNameText: HTMLSpanElement
+) => {
+  const rect = fileBtn.getBoundingClientRect();
+  const buttonWrapperRect = buttonWrapper.getBoundingClientRect();
+  const fileNameRect = fileNameText.getBoundingClientRect();
+  whiteLine.style.width = `${buttonWrapperRect.width + fileNameRect.width}px`;
+  whiteLine.style.top = `${rect.bottom - 86}px`;
+  whiteLine.style.left = `${fileNameRect.left - 40}px`;
 };
 
 export const loadFile = (fileName: string | null) => {
@@ -133,12 +164,22 @@ export const saveFile = async (fileName: string, fileData: string) => {
     }
   }
 };
-
+const loadFirstFile = () => {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.endsWith(".js")) {
+      loadFile(key);
+      return;
+    }
+  }
+  textArea.value = "";
+  updateLineNumbers();
+};
 export const fetchFilesFromBackend = async () => {
   const accessToken = getAccessToken();
   if (accessToken) {
     try {
-      const response = await axios.get("http://localhost:3000/files", {
+      const response = await api.get("http://localhost:3000/files", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -161,14 +202,18 @@ export const fetchFilesFromBackend = async () => {
         console.error("Unexpected response structure:", response.data);
       }
 
-      loadFilesFromStorage();
+      loadAndDisplayFiles();
+      loadFirstFile();
+      updateHighlighting();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         console.log("Token might be expired, attempting to refresh...");
       }
     }
   } else {
-    loadFilesFromStorage();
+    loadAndDisplayFiles();
+    loadFirstFile();
+    updateHighlighting();
   }
 };
 
@@ -260,19 +305,11 @@ const createDeleteButton = (file: HTMLButtonElement) => {
 
 const updateCurrentFileAfterDeletion = (deletedFileName: string) => {
   if (deletedFileName === currentFileName) {
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.endsWith(".js")) {
-        keys.push(key);
-      }
-    }
-
-    if (keys.length > 0) {
-      const lastKey = keys[keys.length - 1];
-      if (lastKey) {
-        loadFile(lastKey);
-      }
+    const jsFiles = Object.keys(localStorage).filter((key) =>
+      key.endsWith(".js")
+    );
+    if (jsFiles.length > 0) {
+      loadFile(jsFiles[jsFiles.length - 1]);
     } else {
       textArea.value = "";
       textArea.style.display = "none";

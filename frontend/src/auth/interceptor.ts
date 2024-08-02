@@ -4,10 +4,19 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { getAccessToken } from "../editor/fileOperations";
 import { logOutFunction } from "./login";
 
 const api: AxiosInstance = axios.create({
   baseURL: "http://localhost:3000",
+});
+let authCheckInterval: NodeJS.Timeout | null = null;
+
+window.addEventListener("load", async () => {
+  const isLoggedIn = await checkAuthStatus();
+  if (isLoggedIn) {
+    authCheckInterval = startAuthStatusCheck();
+  }
 });
 
 // todo  not working access token expires
@@ -23,13 +32,12 @@ const refreshToken = async (): Promise<string> => {
   const { refreshToken } = userCredentials;
 
   if (!refreshToken) {
-    sessionExpiredLogout();
     throw new Error("No refresh token available");
   }
 
   try {
-    const response = await api.post(
-      "/auth/refresh-token",
+    const response = await axios.post(
+      "http://localhost:3000/auth/refresh-token",
       {},
       {
         headers: {
@@ -45,11 +53,11 @@ const refreshToken = async (): Promise<string> => {
 
     return newAccessToken;
   } catch (error) {
-    console.error("Failed to refresh token:", error);
-    sessionExpiredLogout();
     throw error;
   }
 };
+
+// request interceptor
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const userCredentials = JSON.parse(
@@ -65,6 +73,7 @@ api.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
+// response interceptor
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
@@ -84,7 +93,6 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        console.error("Failed to refresh token:", refreshError);
         sessionExpiredLogout();
         return Promise.reject(refreshError);
       }
@@ -93,5 +101,43 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+async function checkAuthStatus() {
+  const accessToken = getAccessToken();
+  if (!accessToken) {
+    return false;
+  }
+  try {
+    await api.get("/auth/status", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return true;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      logOutFunction();
+    }
+    return false;
+  }
+}
+// check after  every 5 minutes
+function startAuthStatusCheck(interval = 310000) {
+  return setInterval(checkAuthStatus, interval);
+}
+
+// Function to call when user logs in
+export function onUserLogin() {
+  if (!authCheckInterval) {
+    authCheckInterval = startAuthStatusCheck();
+  }
+}
+
+// Function to call when user logs out
+export function onUserLogout() {
+  if (authCheckInterval) {
+    clearInterval(authCheckInterval);
+    authCheckInterval = null;
+  }
+}
 
 export default api;

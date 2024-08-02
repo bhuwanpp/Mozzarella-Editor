@@ -61,11 +61,6 @@ async function updateUserUI(users: any[]) {
       button.addEventListener("click", async () => {
         const userId = button.getAttribute("data-user-id");
         if (userId) {
-          if (userId === "2") {
-            alert("You cannot delete your own account.");
-            return;
-          }
-          // Show confirmation dialog
           const isConfirmed = window.confirm(
             "Are you sure you want to delete this user?"
           );
@@ -73,8 +68,10 @@ async function updateUserUI(users: any[]) {
           if (isConfirmed) {
             try {
               await deleteUser(userId);
+              console.log("it comes here admin delete ");
               showAllUsersFunction();
             } catch (error) {
+              alert("you cannot delete to self or admin");
               console.error("Error deleting user file:", error);
             }
           }
@@ -152,7 +149,6 @@ async function deleteUser(userId: string) {
     });
     console.log(`User  with ID ${userId} deleted successfully`);
   } catch (error) {
-    console.error("Error deleting user", error);
     throw error;
   }
 }

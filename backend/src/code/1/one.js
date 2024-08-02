@@ -1,2 +1,2 @@
 // Your JavaScript code here 
-console.log("new f
+console.log("new function");

@@ -26,6 +26,7 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
   try {
     const user = verify(token[1], config.jwt.secret!) as User;
     req.user = user;
+
   } catch (error) {
     next(new UnauthenticatedError("Unauthenticated"));
   }

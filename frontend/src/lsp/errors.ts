@@ -1,24 +1,6 @@
-import { textArea } from "../main";
-
-import io from "socket.io-client";
-
-const socket = io("http://localhost:8080", { transports: ["websocket"] });
 export const errorsDiv = document.getElementById("errors") as HTMLDivElement;
 
-socket.on("connect", () => {
-  console.log("Connected to server");
-});
-
-textArea.addEventListener("input", () => {
-  const code = textArea.value;
-  socket.emit("codeUpdate", code);
-});
-
-socket.on("diagnostics", (diagnostics) => {
-  showErrors(diagnostics);
-});
-
-function showErrors(diagnostics: any) {
+export function showErrors(diagnostics: any) {
   if (Object.keys(diagnostics).length >= 1) {
     errorsDiv.style.display = "block";
   } else {

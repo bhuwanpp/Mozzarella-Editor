@@ -5,47 +5,39 @@
 *{
     font-family: "Fira Code", monospace;
 }
-body{
-  background-color: #282A36;
-  color: white;
-   
-}
-body.white {
-  
-  background: #FFF6E9;
-  color: black;
+body {
+  @apply bg-editor text-white;
 }
 
-body.white #light {
-display: block;
+body.white {
+  @apply bg-white_bg text-black;
+}
+
+body.white #light, #error-highlight:hover + #errors , #error-highlight:hover + #error-message, 
+.file-button:hover  .rename-button,
+.file-button:hover .delete-button
+{
+  @apply block;
 }
 
 body.white #dark {
-display: none;
+  @apply hidden;
 }
+
 body.white .text-area, body.white .output-area, body.white .loginUi, body.white .addFile:hover{
-  background: #FFF6E9;
-  color: black;
+  @apply bg-white_bg text-black;
 }
 
 body.white .output-show , body.white .lineNumber{
-  background:#d1c9be;
-  color: black;
+  @apply bg-output_white text-black;
 }
 body.white .addFile:hover{
-  background: #d1c9be;
-  color: black;
+  @apply bg-output_white text-black;
 }
 
 body.white #whiteLine {
-  background: black;
+  @apply bg-black;
 }
-
-.file-button:hover  .rename-button,
-.file-button:hover .delete-button {
-  display: block;
-}
-
 
 .file-button {
   @apply flex   items-center gap-1 relative;
@@ -70,96 +62,50 @@ body.white #whiteLine {
 .white-line{
     @apply bg-white w-10 h-2 absolute 
 }
-#textarea, #highlighted-code {
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  tab-size: 4;
-}
-#textarea {
-  color: transparent; 
-  caret-color: white; 
-  position: relative;
-  z-index: 2;
-  word-break:normal;
-  white-space: pre;
-  overflow-x: scroll;
-  min-height: 100vh;
-  caret-color:white;
-  line-height: 1.5em;
-}
 
 body.white #textarea {
-  caret-color: black;
-}
-
-#highlighted-code {
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1; 
-  overflow: hidden;
+  @apply caret-black;
 }
 
 .token.operator {
-  background: none;
-  background-color: transparent !important;
+  @apply bg-transparent !important;
 }
+
 #suggestions div {
-  padding: 5px 10px;
-  cursor: pointer;
+  @apply p-1.5 cursor-pointer;
 }
 
 #suggestions div:hover,
 #suggestions .selected {
-  background-color: #3c3f4d;
+  @apply bg-suggestion_hover
 }
-#suggestions {
-  position: fixed; 
-}
-/* .error {
-  background-color: #fdd;
-  border-left: 2px solid red;
-} */
 
+.error {
+  @apply bg-[#fdd] border-l-2 border-red-500;
+}
 
 #error-highlight {
-  text-decoration: underline;
-  text-decoration-color: red;
-  text-decoration-style: wavy;
-  position: absolute;
-  pointer-events:  none;
+  @apply underline decoration-red-500 decoration-wavy absolute pointer-events-none;
 }
-
-#error-highlight:hover + #errors {
-  display: block;
-}
-
 #error-message {
-  display: none;
-  position: absolute;
-  background-color: #000;
-  color: #fff;
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 12px;
-  z-index: 100;
-}
-
-#error-highlight:hover + #error-message {
-  display: block;
+  @apply hidden absolute bg-black text-white p-1.5 rounded text-xs z-10;
 }
 
 .highlight {
-  position: absolute;
-  background: rgba(104, 110, 134, 0.4); 
-  width: 100%;
-  pointer-events: none; 
+  @apply absolute bg-highlight_bg w-full pointer-events-none;
 }
 
 #textarea::selection {
-  background-color: rgba(104, 110, 134, 0.4); 
-  /* color: black;  */
+  @apply bg-highlight_bg
 }
 .closeBtn{
   @apply text-3xl  absolute top-0 right-5 text-center hover:scale-110  text-blue-600
+}
+
+.input--field{
+   @apply outline-none text-black px-1 py-1 border border-black
+}
+.blue--btn{
+ @apply  bg-blue-400 hover:bg-blue-500 transition-all text-center text-black px-2 py-1 rounded-md cursor-pointer text-xl
+
 }

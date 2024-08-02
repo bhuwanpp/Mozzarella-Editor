@@ -62,7 +62,7 @@
         <br />
         <button
           id="updatePasswordBtn"
-          class="text-center px-2 py-1 rounded-md text-xl bg-blue-500 cursor-pointer"
+          class="blue--btn"
         >
           updatePassword
         </button>
@@ -78,23 +78,25 @@
           id="forgotEmail"
           placeholder="Email"
           required
-          class="outline-none text-black px-1 py-1 border border-black"
+          class="input--field"
         />
         <input
-          type="text"
+          type="password"
           id="oldPassword"
           placeholder="Old Password"
           required
-          class="outline-none text-black px-1 py-1 border border-black"
+          class="input--field"
         />
         <input
-          type="text"
+          type="password"
           id="newPassword"
           placeholder="New Password"
           required
-          class="outline-none text-black px-1 py-1 border border-black"
+          class="input--field"
         />
-        <button type="button" id="updatePassword" class="bg-blue-300 text-black px-2 py-1 rounded-md">Update Password</button>
+        <button type="button" id="updatePassword"
+        class="blue--btn"
+         >Update Password</button>
       </form>
       
 
@@ -108,7 +110,7 @@
       <!-- login ui  -->
       <div
         id="loginUi"
-        class="loginUi hidden z-10 absolute top-1/3 left-1/3 bg-editor px-10 py-10 border border-white"
+        class="loginUi hidden z-50 absolute top-1/3 left-1/3 bg-editor px-10 py-10 border border-white"
       >
         <p class="pb-5" id="authInfo">Login with email or password</p>
         <p class="pb-5 hidden w-80" id="forgotInfo">
@@ -120,7 +122,7 @@
             type="text"
             id="name"
             placeholder="name"
-            class="outline-none hidden text-black px-1 py-1 border border-black"
+            class="input--field"
           />
 
           <input
@@ -128,7 +130,7 @@
             type="email"
             id="email"
             placeholder="email"
-            class="outline-none text-black px-1 py-1 border border-black"
+            class="input--field"
           />
 
           <input
@@ -136,23 +138,23 @@
             type="text"
             id="password"
             placeholder="password"
-            class="outline-none text-black px-1 py-1 border border-black"
+            class="input--field"
           />
 
           <button type="submit"
-            class="bg-blue-500 hover:bg-blue-700 transition-all"
+          class="blue--btn"
             id="login"
           >
             login
           </button>
           <button type="submit"
-            class="hidden bg-blue-500 hover:bg-blue-700 transition-all"
+          class="blue--btn"
             id="signup"
           >
             signup
           </button>
           <button
-            class="hidden bg-blue-500 hover:bg-blue-700 transition-all"
+          class="blue--btn"
             id="continueBtn"
           >
             continue
@@ -186,7 +188,7 @@
     <nav class="flex justify-between px-10  mt-2 relative ">
       <div class=" files left flex items-center gap-14 flex-wrap relative" id="files">
        <!-- white line  -->
-          <p id="whiteLine" class="bg-white h-[2px] absolute w-[137px]  top-10"></p>       
+          <p id="whiteLine" class="bg-white h-[2px] absolute w-[137px]   top-10"></p>       
           <button
           class="addFile text-3xl hover:bg-black p-1 rounded-full  "
           id="add-file"
@@ -215,19 +217,21 @@
           <div id="highlight" class="highlight"></div>
           <textarea
             id="textarea"
-            class="w-full resize-none h-screen  pl-1 outline-none text-md bg-transparent border border-gray-400 rounded-md"
+            class="w-full text-transparent caret-white relative  break-words
+            whitespace-pre overflow-x-scroll min-h-screen leading-6 resize-none h-screen  pl-1 outline-none text-md bg-transparent border border-gray-400 rounded-md"
             placeholder="Write your JS code here"
           ></textarea>
           <pre
             id="highlighted-code"
-            class="absolute top-0 left-0 w-full pl-1 h-full text-md overflow-hidden"
+            class="absolute top-0 left-0 w-full pl-1 h-full text-md overflow-hidden
+            pointer-events-none  z-10 overflow-hidden;"
           ></pre>
 
         <!-- error detecion -->
       </div>
       <div
       id="suggestions"
-      class="suggestion absolute hidden bg-editor text-white border border-white max-h-[200px] overflow-y-auto shadow-sm z-[1000]"
+      class="suggestion fixed hidden bg-editor text-white border border-white max-h-[200px] overflow-y-auto shadow-sm z-[1000]"
       ></div>
       
     </section>
@@ -250,9 +254,9 @@
 
     </main>
 
-    <script type="module" src="/src/lsp/errors.ts"></script>
-    <script type="module" src="/src/lsp/suggestion.ts"></script>
     <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/auth/interceptor.ts"></script>
+    <script type="module" src="/src/lsp/index.ts"></script>
+
   </body>
 </html>

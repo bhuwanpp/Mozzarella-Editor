@@ -3,6 +3,7 @@ import HttpStatusCodes from "http-status-codes";
 import { GetUserQuery } from "../interfaces/user";
 import * as UserService from "../service/user";
 import loggerWithNameSpace from "../utils/logger";
+import { ForbiddenError } from "../error/ForbiddenError";
 const logger = loggerWithNameSpace("UserController");
 
 export async function getUsers(
@@ -67,6 +68,10 @@ export async function deleteUser(
         .json({ error: `User with id ${id} not found` });
     }
   } catch (e) {
-    next(e);
+    if (e instanceof ForbiddenError) {
+      res.status(HttpStatusCodes.FORBIDDEN).json({ error: e.message });
+    } else {
+      next(e);
+    }
   }
 }
