@@ -8,7 +8,7 @@ export class UserModel extends BaseModel {
       name: user.name,
       email: user.email,
       password: user.password,
-      role: ROLE.USER
+      role: ROLE.USER,
     };
     const query = await this.queryBuilder().insert(userToCreate).table("users");
     return query;
@@ -18,19 +18,18 @@ export class UserModel extends BaseModel {
     try {
       await this.queryBuilder()
         .update({ password: newPassword })
-        .table('users')
+        .table("users")
         .where({ email });
     } catch (error) {
-      console.error('Error updating user:', error);
-      throw new Error('Unable to update user password');
+      console.error("Error updating user:", error);
+      throw new Error("Unable to update user password");
     }
-
   }
 
   static getUsers(filter: GetUserQueryPage) {
     const { q } = filter;
     const query = this.queryBuilder()
-      .select("userId", "name", "email",)
+      .select("userId", "name", "email")
       .table("users")
       .limit(filter.size)
       .offset((filter.page - 1) * filter.size);
@@ -50,7 +49,7 @@ export class UserModel extends BaseModel {
   }
 
   static getUserById(userId: string) {
-    console.log('userid' + userId)
+    console.log("userid" + userId);
     const query = this.queryBuilder()
       .select("*")
       .table("users")
@@ -58,14 +57,21 @@ export class UserModel extends BaseModel {
       .first();
     return query;
   }
+
   static async getUserByEmail(email: string) {
-    const query = await this.queryBuilder().select('userId', 'name', 'email', 'password', 'role').table('users').where({ email }).first()
+    const query = await this.queryBuilder()
+      .select("userId", "name", "email", "password", "role")
+      .table("users")
+      .where({ email })
+      .first();
     return query;
   }
 
   static async deleteUser(userId: string) {
-    const query = await this.queryBuilder().delete().table("users").where({ userId });
+    const query = await this.queryBuilder()
+      .delete()
+      .table("users")
+      .where({ userId });
     return query;
   }
 }
-

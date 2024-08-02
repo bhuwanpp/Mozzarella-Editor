@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
-import { Request } from "../interfaces/auth";
 import HttpsStatusCode from "http-status-codes";
-import { UnauthenticatedError } from "../error/UnauthenticateError";
-import loggerWithNameSpace from "../utils/logger";
-import NotFoundError from "../error/NotFoundError";
-import ConflictError from "../error/ConflictError";
-import { UnauthorizeError } from "../error/UnauthorizedError";
 import { BadRequestError } from "../error/BadRequestError";
+import ConflictError from "../error/ConflictError";
+import NotFoundError from "../error/NotFoundError";
+import { UnauthenticatedError } from "../error/UnauthenticateError";
+import { UnauthorizeError } from "../error/UnauthorizedError";
+import { Request } from "../interfaces/auth";
+import loggerWithNameSpace from "../utils/logger";
 const logger = loggerWithNameSpace("ErrorHandler");
 export function notFoundError(req: Request, res: Response) {
   return res.status(HttpsStatusCode.NOT_FOUND).json({

@@ -5,9 +5,7 @@ import {
   getFile,
   getUserFile,
   renameFile,
-
 } from "../controller/file";
-import { ROLE } from "../enums/role";
 import { auth } from "../middleware/auth";
 
 const router = express();

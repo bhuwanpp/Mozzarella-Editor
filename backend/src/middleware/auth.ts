@@ -1,22 +1,14 @@
 import { NextFunction, Response } from "express";
-import { Request } from "../interfaces/auth";
-import { verify } from "jsonwebtoken";
+import jwt, { verify } from "jsonwebtoken";
 import config from "../config";
-import { UnauthenticatedError } from "../error/UnauthenticateError";
-import { User } from "../interfaces/user";
 import { ROLE } from "../enums/role";
+import { UnauthenticatedError } from "../error/UnauthenticateError";
 import { UnauthorizeError } from "../error/UnauthorizedError";
-import jwt from "jsonwebtoken";
+import { Request } from "../interfaces/auth";
+import { User } from "../interfaces/user";
 import { getUserById } from "../service/user";
 import { ApiResponse } from "../utils/apiResponse";
 
-/**
- * Middleware function to authenticate requests using JWT.
- * @param {Request} req - Express Request object.
- * @param {Response} res - Express Response object.
- * @param {NextFunction} next - Express NextFunction to pass control to the next middleware.
- * @returns {void} - Returns nothing directly but calls next() or throws an Error.
- */
 export function auth(req: Request, res: Response, next: NextFunction): void {
   const { authorization } = req.headers;
 
@@ -30,6 +22,7 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
     next(new UnauthenticatedError("Unauthenticated"));
     return;
   }
+  // verify is checking it expire or not
   try {
     const user = verify(token[1], config.jwt.secret!) as User;
     req.user = user;
@@ -39,11 +32,6 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
-/**
- * Middleware to authorize users based on their roles.
- *
- * @param {string | string[]} role - The role(s) allowed to access the route.
- */
 export function authorize(role: ROLE | ROLE[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
@@ -65,13 +53,12 @@ export function authorize(role: ROLE | ROLE[]) {
   };
 }
 
-
 export const verifyUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  console.log('it comes here')
+  console.log("it comes here");
   const { authorization } = req.headers;
   if (!authorization) {
     next(new UnauthenticatedError("Access token required"));
@@ -83,10 +70,10 @@ export const verifyUser = async (
     return;
   }
   try {
-    console.log('it comes in try block')
-    const playload = jwt.verify(token[1], config.jwt.secret!) as User
+    console.log("it comes in try block");
+    const playload = jwt.verify(token[1], config.jwt.secret!) as User;
 
-    const user = await getUserById(playload.userId)
+    const user = await getUserById(playload.userId);
     // Check if the user’s role is admin
     if (user.role.includes(ROLE.ADMIN)) {
       res.status(200).json(new ApiResponse("Verified", user));

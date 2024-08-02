@@ -1,15 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import HttpStatusCodes from "http-status-codes";
-import { GetUserQuery, User } from "../interfaces/user";
+import { GetUserQuery } from "../interfaces/user";
 import * as UserService from "../service/user";
 import loggerWithNameSpace from "../utils/logger";
 const logger = loggerWithNameSpace("UserController");
 
-/**
- * Controller function to get users based on query parameters.
- * @param {Request<any, any, any, GetUserQuery>} req - Express Request object containing query parameters in req.query.
- * @param {Response} res - Express Response object used to send JSON response.
- */
 export async function getUsers(
   req: Request<any, any, any, GetUserQuery>,
   res: Response
@@ -20,12 +15,6 @@ export async function getUsers(
   res.status(HttpStatusCodes.OK).json(data);
 }
 
-/**
- * Controller function to get user details by ID.
- * @param {Request} req - Express Request object containing user ID in req.params.
- * @param {Response} res - Express Response object used to send JSON response.
- * @param {next} next - Express nextfunction object
- */
 export async function getUserById(
   req: Request,
   res: Response,
@@ -41,12 +30,6 @@ export async function getUserById(
   }
 }
 
-/**
- * Controller function to update user details by ID.
- * @param {Request} req - Express Request object containing user ID in req.params and updated user details in req.body.
- * @param {Response} res - Express Response object used to send JSON response.
- * @param {next} next - Express nextfunction object
- */
 export async function updaePassword(
   req: Request,
   res: Response,

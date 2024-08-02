@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <!-- google font  -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,11 +14,13 @@
     />
     <link rel="icon" type="image/x-icon" href="public/images/logo.png" />
     <title>Mozzarella Editor</title>
+
     <!-- for icons  -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
   </head>
 
   <body class="py-5 pb-52 ">
+
     <!-- header  -->
     <header
       class="flex justify-between items-center px-10 "
@@ -105,7 +108,7 @@
       <!-- login ui  -->
       <div
         id="loginUi"
-        class="loginUi hidden z-10 absolute top-1/3 left-1/3 bg-black px-10 py-10 border border-black"
+        class="loginUi hidden z-10 absolute top-1/3 left-1/3 bg-editor px-10 py-10 border border-white"
       >
         <p class="pb-5" id="authInfo">Login with email or password</p>
         <p class="pb-5 hidden w-80" id="forgotInfo">
@@ -178,6 +181,7 @@
         </form>
       </div>
     </header>
+
     <!-- nav -->
     <nav class="flex justify-between px-10  mt-2 relative ">
       <div class=" files left flex items-center gap-14 flex-wrap relative" id="files">
@@ -202,8 +206,8 @@
         </button>
       </div>
     </nav>
-    <!-- main  -->
 
+    <!-- main  -->
     <main class="mt-5 flex  flex-grow ">
       <section class="w-3/5 flex  relative">
         <div class="lineNumber  w-5 text-md  px-5 text-center bg-[#3c3f4d]" id="line-numbers"></div>
@@ -243,10 +247,12 @@
       hidden text-red-600  bg-editor border border-white px-5 pr-10 z-30">
      </div>
   </aside>
+
     </main>
 
     <script type="module" src="/src/lsp/errors.ts"></script>
     <script type="module" src="/src/lsp/suggestion.ts"></script>
     <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/auth/interceptor.ts"></script>
   </body>
 </html>
