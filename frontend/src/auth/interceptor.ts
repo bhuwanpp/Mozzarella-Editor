@@ -4,6 +4,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { CHECK_STATUS_NUM } from "../constants";
 import { getAccessToken } from "../editor/fileOperations";
 import { HTTPSSTATUS } from "../enums/httpStatus";
 import { logOutFunction } from "./login";
@@ -50,7 +51,7 @@ const refreshToken = async (): Promise<string> => {
 
   try {
     const response = await axios.post(
-      "http://localhost:3000/auth/refresh-token",
+      `${import.meta.env.VITE_BASE_URL}/auth/refresh-token`,
       {},
       {
         headers: {
@@ -103,6 +104,7 @@ api.interceptors.response.use(
           localStorage.getItem("userCredentials") || "{}"
         );
         userCredentials[0] = newAccessToken;
+
         localStorage.setItem(
           "userCredentials",
           JSON.stringify(userCredentials)
@@ -135,13 +137,14 @@ async function checkAuthStatus() {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+
     return true;
   } catch (error) {
     if (
       axios.isAxiosError(error) &&
       error.response?.status === HTTPSSTATUS.Unauthorized
     ) {
-      // logOutFunction();
+      sessionExpiredLogout();
     }
     return false;
   }
@@ -149,10 +152,10 @@ async function checkAuthStatus() {
 
 /**
  * Starts periodic checks of authentication status.
- * @param {number} interval The interval time in milliseconds for checking authentication status (default is 15000ms).
+ * @param {number} interval The interval time in milliseconds for checking authentication status (default is 5min).
  * @returns {NodeJS.Timeout} The interval ID.
  */
-function startAuthStatusCheck(interval = 15000) {
+function startAuthStatusCheck(interval = CHECK_STATUS_NUM) {
   return setInterval(checkAuthStatus, interval);
 }
 

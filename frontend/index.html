@@ -13,8 +13,8 @@
       rel="stylesheet"
     />
     <link rel="icon" type="image/x-icon" href="public/images/logo.png" />
+    <link rel="stylesheet" href="/src/normalize.css">
     <title>Mozzarella Editor</title>
-
     <!-- for icons  -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
   </head>
@@ -219,29 +219,28 @@
       <!-- section input area  -->
       <section class=" md:w-3/5 flex  relative">
         <div class="lineNumber  w-5 text-md  px-5 text-center bg-suggestion_hover " id="line-numbers"></div>
-
         <div class="relative w-full h-full">
           <div id="highlight" class="highlight"></div>
-
-          <textarea
+                <textarea
             id="textarea"
-            class="w-full  h-full text-transparent caret-white relative  break-words
-            whitespace-pre  min-h-screen  
-             resize-none outline-none  text-md bg-transparent border  font-mono leading-normal border-gray-400 rounded-md"
+            class="w-full bg-transparent text-transparent caret-white
+             overflow-auto whitespace-pre border border-white  min-h-screen  resize-none outline-none"
 
             placeholder="Write your JS code here"
           ></textarea>
 
           <pre
             id="highlighted-code"
-            class="absolute top-0 left-0 text-md  w-full 
-             bg-edito border border-gray-400 rounded-md caret-white   h-full text-md overflow-hidden
-            pointer-events-none break-words
-             font-mono leading-normal bg-transparent   z-10 overflow-hidden;"
+            class="absolute top-0 left-0
+              bg-transparent overflow-auto whitespace-pre   w-full  h-full  rounded-md border
+               border-white   pointer-events-none z-10"
           >
         </pre>
 
+
       </div>
+
+    </div>
       <div
       id="suggestions"
       class="suggestion fixed hidden bg-editor text-white border
@@ -274,7 +273,6 @@
 
     <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/lsp/index.ts"></script>
-    <script type="module" src="/src/highlight.ts"></script>
     <script type="module" src="/src/auth/interceptor.ts"></script>
   </body>
 </html>

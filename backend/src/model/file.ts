@@ -48,7 +48,6 @@ export class FileModal {
 
     try {
       await fs.access(FILES_DIR);
-      console.log("it comes in try", FILES_DIR);
     } catch {
       // If the directory doesn't exist, return an empty array
       return [];
@@ -64,7 +63,6 @@ export class FileModal {
         files.push({ fileName, fileData });
       }
     }
-    console.log(files);
 
     return files;
   }

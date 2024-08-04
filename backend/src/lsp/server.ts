@@ -47,7 +47,6 @@ io.on("connection", (socket: Socket) => {
               socket.emit("completion", response.body);
             } else if (response.command === "semanticDiagnosticsSync") {
               socket.emit("diagnostics", response.body);
-              console.log("emitting diagnostics", response.body);
             }
           }
         } catch (error) {
@@ -64,7 +63,6 @@ io.on("connection", (socket: Socket) => {
 
   // Handle incoming code updates from clients
   socket.on("codeUpdate", (code: string) => {
-    console.log("Received code update:", code);
     sendOpenRequest(tsServer, code);
     sendCompletionRequest(tsServer, code);
     sendDiagnosticsRequest(tsServer);

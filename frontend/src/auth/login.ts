@@ -13,7 +13,7 @@ import {
 } from "../interface/user";
 import { afterLoginUI, showAllUsersBtn } from "../main";
 import { AfterLoginFunction, loginBackFunction, removeLogin } from "./authUi";
-import api, { onUserLogin, onUserLogout } from "./interceptor";
+import { onUserLogin, onUserLogout } from "./interceptor";
 
 const loginError = document.getElementById(
   "loginError"
@@ -39,9 +39,11 @@ export async function logOutFunction() {
 export const loginUser = async (user: IUser) => {
   try {
     const response = await axios.post(
-      "http://localhost:3000/auth/login",
+      `${import.meta.env.VITE_BASE_URL}/auth/login`,
       user,
-      { timeout: LOGIN_TIME_OUT }
+      {
+        timeout: LOGIN_TIME_OUT,
+      }
     );
     const addedUser = response.data;
     const { accessToken, refreshToken, name } = addedUser;
@@ -66,18 +68,6 @@ export const loginUser = async (user: IUser) => {
 };
 
 /**
- * Checks if the access token has expired based on the expiration time stored in localStorage.
- * @returns {boolean} True if the token is expired, false otherwise.
- */
-export const isTokenExpired = (): boolean => {
-  const userCredentials = localStorage.getItem("userCredentials");
-  if (!userCredentials) return true;
-
-  const [, , , expirationTime] = JSON.parse(userCredentials);
-  return Date.now() >= expirationTime;
-};
-
-/**
  * Registers a new user by sending a POST request with user details.
  * If successful, alerts the user and navigates back to the login screen.
  * @param {INewUser} newUser - The details of the new user to be registered.
@@ -85,9 +75,11 @@ export const isTokenExpired = (): boolean => {
 export const registerUser = async (newUser: INewUser) => {
   try {
     const response = await axios.post(
-      "http://localhost:3000/auth/signup",
+      `${import.meta.env.VITE_BASE_URL}/auth/signup`,
       newUser,
-      { timeout: 10000 }
+      {
+        timeout: 10000,
+      }
     );
     const registeredUser = response.data;
     alert("you are succesfully signup ");
@@ -114,12 +106,16 @@ export const registerUser = async (newUser: INewUser) => {
 export async function updatePasswordFunction(user: IupdateUser) {
   const accessToken = getAccessToken();
   try {
-    const response = await axios.put("http://localhost:3000/users", user, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await axios.put(
+      `${import.meta.env.VITE_BASE_URL}/users`,
+      user,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     return response.data;
   } catch (error: any) {
     const errorResponse = error.response?.data as IErrorResponse;
@@ -139,12 +135,15 @@ export async function updatePasswordFunction(user: IupdateUser) {
 export async function afterLoginShow() {
   const accessToken = getAccessToken();
   try {
-    const response = await api.get("/auth/me", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/auth/me`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     const result = response.data.message;
     if (result === "Verified") {

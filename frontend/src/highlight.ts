@@ -14,12 +14,14 @@ const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
  */
 export function updateHighlighting() {
   let code = textarea.value;
+
   const highlightedHTML = Prism.highlight(
     code,
     Prism.languages.javascript,
     "javascript"
   );
-  highlightedCode.innerHTML = highlightedHTML + "\n";
+
+  highlightedCode.innerHTML = highlightedHTML;
 
   // Synchronize scroll position between the textarea and highlighted code
   highlightedCode.scrollTop = textarea.scrollTop;

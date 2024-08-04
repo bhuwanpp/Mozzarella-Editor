@@ -30,9 +30,7 @@ export async function signup(user: User) {
  * @throws {NotFoundError} If the user does not exist or the password is invalid.
  */
 export async function login(body: Pick<User, "email" | "password">) {
-  console.log("it comes in service");
   const existingUser = await UserModel.UserModel.getUserByEmail(body.email);
-  console.log("service" + existingUser);
   if (!existingUser) {
     throw new NotFoundError("User not Exists");
   }
