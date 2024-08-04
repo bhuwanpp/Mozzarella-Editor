@@ -48,7 +48,6 @@ export class UserModel extends BaseModel {
    */
   static getUsers(filter: GetUserQueryPage) {
     const { q } = filter;
-    console.log(filter.page);
     const query = this.queryBuilder()
       .select("userId", "name", "email")
       .table("users")
@@ -80,7 +79,6 @@ export class UserModel extends BaseModel {
    * @returns A query object for the user details.
    */
   static getUserById(userId: string) {
-    console.log("userid" + userId);
     const query = this.queryBuilder()
       .select("*")
       .table("users")

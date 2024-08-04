@@ -21,6 +21,8 @@ export const runCode = async () => {
   iframe.style.display = "none";
   document.body.appendChild(iframe);
 
+  // The contentWindow property returns the Window object of an HTMLIFrameElement
+  //  if same origin with parents
   const iframeWindow = iframe.contentWindow as Window & { console: Console };
   const consoleMethods: ConsoleMethod[] = ["log", "error", "warn", "info"];
 
@@ -30,6 +32,7 @@ export const runCode = async () => {
     };
   });
 
+  // output error handles
   iframeWindow.onerror = (message, source, lineno, colno, error) => {
     output.textContent += `Error: ${message} (line ${lineno}, column ${colno})\n`;
     return true;

@@ -1,5 +1,4 @@
 import axios from "axios";
-import api from "../auth/interceptor";
 import {
   BOTTOM_OFFSET,
   LEFT_OFFSET,
@@ -73,9 +72,12 @@ export const loadAndDisplayFiles = async () => {
   const accessToken = getAccessToken();
   if (accessToken) {
     try {
-      const response = await api.get("http://localhost:3000/files", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/files`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
       clearJsFilesFromLocalStorage();
       if (Array.isArray(response.data.data)) {
         response.data.data.forEach(
@@ -197,7 +199,7 @@ export const saveFile = async (fileName: string, fileData: string) => {
   if (accessToken) {
     try {
       await axios.post(
-        "http://localhost:3000/files",
+        `${import.meta.env.VITE_BASE_URL}/files`,
         {
           fileName,
           fileData,
@@ -238,11 +240,14 @@ export const fetchFilesFromBackend = async () => {
   const accessToken = getAccessToken();
   if (accessToken) {
     try {
-      const response = await api.get("http://localhost:3000/files", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/files`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
@@ -321,7 +326,7 @@ const createRenameButton = (fileNameText: HTMLSpanElement) => {
         try {
           if (accessToken) {
             await axios.put(
-              `http://localhost:3000/files/rename`,
+              `${import.meta.env.VITE_BASE_URL}/files/rename`,
               { oldFileName, newFileName },
               {
                 headers: {
@@ -365,11 +370,14 @@ const createDeleteButton = (file: HTMLButtonElement) => {
       const accessToken = getAccessToken();
       if (accessToken) {
         try {
-          await axios.delete(`http://localhost:3000/files/${fileName}`, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
+          await axios.delete(
+            `${import.meta.env.VITE_BASE_URL}/files/${fileName}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
         } catch (error) {
           console.error("Error deleting file from backend:", error);
         }

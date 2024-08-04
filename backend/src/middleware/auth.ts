@@ -31,7 +31,6 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
   // verify is checking it expire or not
   try {
     const user = verify(token[1], config.jwt.secret!) as User;
-    console.log("user in auth", user);
     req.user = user;
   } catch (error) {
     next(new UnauthenticatedError("Unauthenticated"));

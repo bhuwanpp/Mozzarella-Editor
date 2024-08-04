@@ -14,7 +14,9 @@ export async function showAllUsersFunction(page = 1) {
   const accessToken = getAccessToken();
   try {
     const response = await axios.get(
-      `http://localhost:3000/users?page=${page}&limit=${usersPerPage}`,
+      `${
+        import.meta.env.VITE_BASE_URL
+      }/users?page=${page}&limit=${usersPerPage}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -138,12 +140,15 @@ async function updateUserUI(users: IUserId[], meta: PaginationMeta) {
 async function fetchUserFile(userId: string) {
   const accessToken = getAccessToken();
   try {
-    const response = await axios.get(`http://localhost:3000/files/${userId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/files/${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching user file:", error);
@@ -205,7 +210,7 @@ function displayUserFile(userFile: IUserFile) {
 async function deleteUser(userId: string) {
   const accessToken = getAccessToken();
   try {
-    await axios.delete(`http://localhost:3000/users/${userId}`, {
+    await axios.delete(`${import.meta.env.VITE_BASE_URL}/users/${userId}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

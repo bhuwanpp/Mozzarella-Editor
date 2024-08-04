@@ -1,3 +1,3 @@
 import { BaseError } from "./BaseError";
 
-export class ForbiddenError extends BaseError { }
+export class ForbiddenError extends BaseError {}

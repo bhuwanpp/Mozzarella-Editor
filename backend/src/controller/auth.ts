@@ -54,7 +54,6 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = req;
-    console.log("controller", body);
     const data = await authService.login(body);
 
     res.status(HttpStatusCodes.OK).json(data);
@@ -89,7 +88,7 @@ export async function refresh(req: Request, res: Response) {
   }
 
   const refreshToken = token[1];
-  verify(refreshToken, config.jwt.secret!, (error, data) => {
+  verify(refreshToken, config.jwt.secret!, async (error, data) => {
     if (error) {
       res.status(HttpStatusCodes.NOT_FOUND).json({
         error: error.message,
@@ -104,9 +103,11 @@ export async function refresh(req: Request, res: Response) {
         role: data.role,
       };
       // create new accessToken
-      const accessToken = sign(payload, config.jwt.secret!);
+      const accessToken = await sign(payload, config.jwt.secret!, {
+        expiresIn: config.jwt.acccessTokenExpiraryMS,
+      });
       const refreshToken = token[1];
-      logger.info("Called login");
+      logger.info("Called refresh token");
       res.status(HttpStatusCodes.OK).json({
         accessToken,
         refreshToken,

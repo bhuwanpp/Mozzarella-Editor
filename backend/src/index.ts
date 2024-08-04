@@ -7,6 +7,7 @@ import { requestLogger } from "./middleware/logger";
 import router from "./routes";
 
 const app = express();
+
 // Security and CORS configurations
 app.use(helmet());
 app.use(cors());

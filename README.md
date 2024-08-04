@@ -61,9 +61,6 @@ Quick Start
    - clone the project:\
      `docker compose up -d`
 
-3. With docker pull:\
-   `docker pull bhuwanluffy/mozzarella-editor`
-
 ### Contributing
 
 Want to contribute? Create a Pull Request!
