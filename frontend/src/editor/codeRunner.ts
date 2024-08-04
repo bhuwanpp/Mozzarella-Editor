@@ -3,6 +3,10 @@ import { ConsoleMethod } from "../types/codeRun";
 
 const output = document.getElementById("output") as HTMLParagraphElement;
 
+/**
+ * Executes the JavaScript code from the textarea within an iframe and captures console output and errors.
+ * Updates the output element with the results or errors from the execution.
+ */
 export const runCode = async () => {
   const code = textArea.value;
   output.textContent = "";
@@ -12,6 +16,7 @@ export const runCode = async () => {
     return;
   }
 
+  // Create an iframe to execute the code
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   document.body.appendChild(iframe);
@@ -31,6 +36,7 @@ export const runCode = async () => {
   };
 
   try {
+    // Execute the code within the iframe
     const script = iframeWindow.document.createElement("script");
     script.textContent = code;
     iframeWindow.document.body.appendChild(script);

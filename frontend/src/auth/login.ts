@@ -19,6 +19,10 @@ const loginError = document.getElementById(
   "loginError"
 ) as HTMLParagraphElement;
 
+/**
+ * Logs out the user by removing credentials from localStorage,
+ * updating the UI, and initializing local storage.
+ */
 export async function logOutFunction() {
   localStorage.removeItem("userCredentials");
   AfterLoginFunction();
@@ -26,7 +30,12 @@ export async function logOutFunction() {
   onUserLogout();
 }
 
-// login user
+/**
+ * Logs in a user by sending a POST request with user credentials.
+ * If successful, stores the access and refresh tokens in localStorage
+ * and updates the UI. Handles and displays login errors.
+ * @param {IUser} user - The user credentials for login.
+ */
 export const loginUser = async (user: IUser) => {
   try {
     const response = await axios.post(
@@ -56,7 +65,10 @@ export const loginUser = async (user: IUser) => {
   }
 };
 
-// Function to check if token is expired
+/**
+ * Checks if the access token has expired based on the expiration time stored in localStorage.
+ * @returns {boolean} True if the token is expired, false otherwise.
+ */
 export const isTokenExpired = (): boolean => {
   const userCredentials = localStorage.getItem("userCredentials");
   if (!userCredentials) return true;
@@ -65,7 +77,11 @@ export const isTokenExpired = (): boolean => {
   return Date.now() >= expirationTime;
 };
 
-// Register user function
+/**
+ * Registers a new user by sending a POST request with user details.
+ * If successful, alerts the user and navigates back to the login screen.
+ * @param {INewUser} newUser - The details of the new user to be registered.
+ */
 export const registerUser = async (newUser: INewUser) => {
   try {
     const response = await axios.post(
@@ -89,7 +105,12 @@ export const registerUser = async (newUser: INewUser) => {
   }
 };
 
-//update user
+/**
+ * Updates the user's password by sending a PUT request with updated user details.
+ * @param {IupdateUser} user - The updated user details.
+ * @returns {Promise<any>} The response data from the server.
+ * @throws {Error} If the update request fails.
+ */
 export async function updatePasswordFunction(user: IupdateUser) {
   const accessToken = getAccessToken();
   try {
@@ -111,10 +132,12 @@ export async function updatePasswordFunction(user: IupdateUser) {
   }
 }
 
-// me router
+/**
+ * Fetches user details after login and shows additional UI elements if the user is verified.
+ * Handles errors and removes UI elements if there is an issue.
+ */
 export async function afterLoginShow() {
   const accessToken = getAccessToken();
-  console.log("me access", accessToken);
   try {
     const response = await api.get("/auth/me", {
       headers: {
@@ -124,9 +147,7 @@ export async function afterLoginShow() {
     });
 
     const result = response.data.message;
-    console.log(result);
     if (result === "Verified") {
-      console.log("it verified");
       afterLoginUI.appendChild(showAllUsersBtn);
     }
   } catch (error) {

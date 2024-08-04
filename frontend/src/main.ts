@@ -82,7 +82,10 @@ export const showAllUsersBtn = document.createElement("button");
 let loginUiVisible = false;
 let afterloginVisible = false;
 
-// escape  key press
+/**
+ * Handles keydown events to close various UI elements when the Escape key is pressed.
+ * @param e - The keyboard event.
+ */
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   if (e.key === "Escape") {
     afterLoginUI.style.display = "none";
@@ -94,6 +97,10 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
   }
 });
 
+/**
+ * Handles click events to close UI elements when clicking outside of them.
+ * @param event - The click event.
+ */
 document.addEventListener("click", (event) => {
   const target = event.target as Node;
   if (loginUiVisible && !loginUi.contains(target) && target !== loginBtn) {
@@ -116,14 +123,22 @@ document.addEventListener("click", (event) => {
   }
 });
 
+/**
+ * Initializes the highlighting and resizing of the textarea when the document is loaded.
+ */
 document.addEventListener("DOMContentLoaded", function () {
   updateHighlighting();
   resizeTextarea();
 });
 
+/**
+ * Handles selection changes to update the highlight div's position and height.
+ */
 document.addEventListener("selectionchange", handleSelectionChange);
 
-// text area input
+/**
+ * Updates line numbers, saves the current file, and adjusts highlighting and textarea size on input.
+ */
 textArea.addEventListener("input", () => {
   updateLineNumbers();
   saveFile(currentFileName, textArea.value);
@@ -132,7 +147,10 @@ textArea.addEventListener("input", () => {
   handleSelectionChange();
 });
 
-// auto complete
+/**
+ * Handles keydown events for autocomplete and code execution.
+ * @param e - The keyboard event.
+ */
 textArea.addEventListener("keydown", async (e) => {
   astAutoComplete(e);
   if (e.ctrlKey && e.key === "Enter") {
@@ -141,13 +159,17 @@ textArea.addEventListener("keydown", async (e) => {
   }
 });
 
-// highlight
+/**
+ * Synchronizes the scroll position of the highlighted code with the textarea.
+ */
 textArea.addEventListener("scroll", function () {
   highlightedCode.scrollTop = textArea.scrollTop;
   highlightedCode.scrollLeft = textArea.scrollLeft;
 });
 
-// to run code
+/**
+ * Runs the code when the run button is clicked.
+ */
 runBtn.addEventListener("click", async () => {
   await runCode();
 });
@@ -164,9 +186,6 @@ function applyTheme() {
   }
 }
 
-// Apply theme on page load
-applyTheme();
-
 lightMode?.addEventListener("click", () => {
   document.body.classList.remove("white");
   localStorage.setItem("theme", "light");
@@ -176,40 +195,53 @@ darkMode?.addEventListener("click", () => {
   localStorage.setItem("theme", "dark");
 });
 
-// log in signup ui
+/**
+ * Handles sign-up button click to show the sign-up UI.
+ */
 singnUpBtn?.addEventListener("click", () => {
   signupBtnFunctions();
 });
 
+/**
+ * Handles login back button click to show the login UI.
+ */
 loginBack.addEventListener("click", () => {
   loginBackFunction();
 });
 
+/**
+ * Toggles the visibility of the login UI.
+ */
 loginBtn.addEventListener("click", () => {
   loginUiVisible = !loginUiVisible;
   loginUi.style.display = loginUiVisible ? "block" : "none";
   resetFunction();
 });
 
+/**
+ * Toggles the visibility of the after-login UI.
+ */
 afterLogin.addEventListener("click", () => {
   afterloginVisible = !afterloginVisible;
   afterLoginUI.style.display = afterloginVisible ? "block" : "none";
   afterLoginShow();
 });
 
-// log out
+/**
+ * Logs out the user when the log out button is clicked.
+ */
 logOut.addEventListener("click", () => {
   logOutFunction();
 });
 
-//update password
-
+/**
+ * Shows the update password form when the update password button is clicked.
+ */
 updatePasswordBtn.addEventListener("click", () => {
   updatePasswordForm.style.display = "flex";
 });
 
 // show all users
-
 showAllUsersBtn.classList.add("showUserBtn");
 showAllUsersBtn.textContent = "Show all users";
 
@@ -218,7 +250,10 @@ showAllUsersBtn.addEventListener("click", async () => {
   showUsersUI.style.display = "block";
 });
 
-// login signup auth
+/**
+ * Handles the form submission for login and displays login errors.
+ * @param e - The submit event.
+ */
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = {
@@ -239,7 +274,10 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// signup user
+/**
+ * Handles the signup process when the signup button is clicked.
+ * @param e - The click event.
+ */
 signup.addEventListener("click", async (e) => {
   e.preventDefault();
 
@@ -257,7 +295,10 @@ signup.addEventListener("click", async (e) => {
   }
 });
 
-// update password
+/**
+ * Handles password update when the update password button is clicked.
+ * @param e - The click event.
+ */
 updatePassword.addEventListener("click", async (e) => {
   e.preventDefault();
 
@@ -278,9 +319,10 @@ updatePassword.addEventListener("click", async (e) => {
   }
 });
 
-// function call declaration
+// Initialize application state
 AfterLoginFunction();
 addFileBtn.addEventListener("click", () => addFile());
 updateLineNumbers();
 initializeLocalStorage();
 loadFile(defaultFileName);
+applyTheme();

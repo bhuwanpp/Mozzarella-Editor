@@ -16,6 +16,9 @@ const updatePasswordForm = document.getElementById(
   "updatePasswordForm"
 ) as HTMLFormElement;
 
+/**
+ * Displays the signup form and related UI elements, while hiding the login form.
+ */
 export function signupBtnFunctions() {
   nameField.style.display = "block";
   alreadyLogin.style.display = "flex";
@@ -24,6 +27,9 @@ export function signupBtnFunctions() {
   signup.style.display = "block";
 }
 
+/**
+ * Hides the signup form and displays the login form and related UI elements.
+ */
 export function loginBackFunction() {
   nameField.style.display = "none";
   alreadyLogin.style.display = "none";
@@ -32,6 +38,9 @@ export function loginBackFunction() {
   signupWrapper.style.display = "flex";
 }
 
+/**
+ * Resets the UI to its initial state before login or signup.
+ */
 export function resetFunction() {
   password.style.display = "block";
   authInfo.style.display = "block";
@@ -43,10 +52,18 @@ export function resetFunction() {
   continueBtn.style.display = "none";
 }
 
+/**
+ * Hides the login UI.
+ */
 export function removeLogin() {
   loginUi.style.display = "none";
 }
 
+/**
+ * Updates the UI after a successful login.
+ * If user credentials are found in localStorage, it displays the username.
+ * Otherwise, it shows the login button and hides the after-login UI.
+ */
 export function AfterLoginFunction() {
   const userCredentialsString = localStorage.getItem("userCredentials");
   if (userCredentialsString) {
@@ -66,6 +83,9 @@ export function AfterLoginFunction() {
   }
 }
 
+/**
+ * Displays the update password form.
+ */
 export function updatePasswordUi() {
   updatePasswordForm.style.display = "block";
 }

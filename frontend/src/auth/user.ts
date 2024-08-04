@@ -1,11 +1,15 @@
 import axios from "axios";
 import Prism from "prismjs";
 import { getAccessToken } from "../editor/fileOperations";
-import { IUserFile, IUserId } from "../interface/user";
+import { IUserFile, IUserId, PaginationMeta } from "../interface/user";
 
 let currentPage = 1;
 const usersPerPage = 10;
-// show all user function
+
+/**
+ * Fetches and displays all users with pagination.
+ * @param {number} [page=1] - The page number to fetch.
+ */
 export async function showAllUsersFunction(page = 1) {
   const accessToken = getAccessToken();
   try {
@@ -19,7 +23,6 @@ export async function showAllUsersFunction(page = 1) {
       }
     );
     const { data: users, meta } = response.data;
-    console.log(meta);
     updateUserUI(users, meta);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -27,11 +30,12 @@ export async function showAllUsersFunction(page = 1) {
   }
 }
 
-// update  users
-async function updateUserUI(
-  users: IUserId[],
-  meta: { page: number; size: number; total: number; totalPages: number }
-) {
+/**
+ * Updates the UI to display the list of users and pagination controls.
+ * @param {IUserId[]} users - The list of users to display.
+ * @param {PaginationMeta} meta - Metadata for pagination.
+ */
+async function updateUserUI(users: IUserId[], meta: PaginationMeta) {
   const showUsersUI = document.getElementById("showUsersUI");
 
   if (showUsersUI) {
@@ -93,7 +97,6 @@ async function updateUserUI(
           if (isConfirmed) {
             try {
               await deleteUser(userId);
-              console.log("it comes here admin delete ");
               showAllUsersFunction(currentPage);
             } catch (error) {
               alert("you cannot delete to self or admin");
@@ -103,6 +106,8 @@ async function updateUserUI(
         }
       });
     });
+
+    // Pagination controls
     const prevButton = document.getElementById("prevPage");
     const nextButton = document.getElementById("nextPage");
     if (prevButton) {
@@ -124,7 +129,12 @@ async function updateUserUI(
   }
 }
 
-// fetch user file
+/**
+ * Fetches the file data for a specific user.
+ * @param {string} userId - The ID of the user whose file is to be fetched.
+ * @returns {Promise<IUserFile>} The user's file data.
+ * @throws {Error} If the file fetch request fails.
+ */
 async function fetchUserFile(userId: string) {
   const accessToken = getAccessToken();
   try {
@@ -141,7 +151,11 @@ async function fetchUserFile(userId: string) {
   }
 }
 
-// escape html
+/**
+ * Escapes HTML special characters in a string to prevent XSS attacks.
+ * @param {string} unsafe - The string to escape.
+ * @returns {string} The escaped string.
+ */
 function escapeHtml(unsafe: string) {
   return unsafe
     .replace(/&/g, "&amp;")
@@ -151,7 +165,10 @@ function escapeHtml(unsafe: string) {
     .replace(/'/g, "&#039;");
 }
 
-// display user file
+/**
+ * Displays the content of a user's file.
+ * @param {IUserFile} userFile - The user's file data to display.
+ */
 function displayUserFile(userFile: IUserFile) {
   const showUsersUI = document.getElementById("showUsersUI");
 
@@ -180,7 +197,11 @@ function displayUserFile(userFile: IUserFile) {
   }
 }
 
-// delete user
+/**
+ * Deletes a user by their ID.
+ * @param {string} userId - The ID of the user to delete.
+ * @throws {Error} If the delete request fails.
+ */
 async function deleteUser(userId: string) {
   const accessToken = getAccessToken();
   try {
@@ -190,7 +211,6 @@ async function deleteUser(userId: string) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(`User  with ID ${userId} deleted successfully`);
   } catch (error) {
     throw error;
   }

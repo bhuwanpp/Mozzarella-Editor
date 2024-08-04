@@ -7,13 +7,13 @@ import {
 } from "../controller/user";
 import { ROLE } from "../enums/role";
 import { auth, authorize } from "../middleware/auth";
-import { validateReqParams, validateReqQuery } from "../middleware/validator";
-import { getUserQuerySchema, paramSchema } from "../schema/user";
+import { validateReqParams } from "../middleware/validator";
+import { paramSchema } from "../schema/user";
 
 const router = express();
+
 router.get(
   "/",
-  // validateReqQuery(getUserQuerySchema),
   auth,
   authorize(ROLE.ADMIN),
   getUsers

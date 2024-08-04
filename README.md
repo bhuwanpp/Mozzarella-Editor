@@ -1,6 +1,6 @@
 # Mozzarella Editor
 
-![alt text](image.png)
+![alt text](/frontend/public/images/readme.png)
 
 ### Description
 

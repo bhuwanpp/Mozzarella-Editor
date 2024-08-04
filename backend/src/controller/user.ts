@@ -1,11 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import HttpStatusCodes from "http-status-codes";
+import { ForbiddenError } from "../error/ForbiddenError";
 import { GetUserQuery } from "../interfaces/user";
 import * as UserService from "../service/user";
 import loggerWithNameSpace from "../utils/logger";
-import { ForbiddenError } from "../error/ForbiddenError";
 const logger = loggerWithNameSpace("UserController");
 
+/**
+ * Retrieves a list of users based on query parameters.
+ * @param {Request<any, any, any, GetUserQuery>} req - The request object containing query parameters.
+ * @param {Response} res - The response object to send the user data.
+ * @returns {Promise<void>}
+ */
 export async function getUsers(
   req: Request<any, any, any, GetUserQuery>,
   res: Response
@@ -16,6 +22,13 @@ export async function getUsers(
   res.status(HttpStatusCodes.OK).json(data);
 }
 
+/**
+ * Retrieves a specific user by their ID.
+ * @param {Request} req - The request object containing the user ID in params.
+ * @param {Response} res - The response object to send the user data.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ * @returns {Promise<void>}
+ */
 export async function getUserById(
   req: Request,
   res: Response,
@@ -31,6 +44,13 @@ export async function getUserById(
   }
 }
 
+/**
+ * Updates the password for a user.
+ * @param {Request} req - The request object containing the user email and passwords in the body.
+ * @param {Response} res - The response object to send the result of the password update.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ * @returns {Promise<void>}
+ */
 export async function updaePassword(
   req: Request,
   res: Response,
@@ -47,6 +67,13 @@ export async function updaePassword(
   }
 }
 
+/**
+ * Deletes a user by their ID.
+ * @param {Request} req - The request object containing the user ID in params.
+ * @param {Response} res - The response object to send the result of the user deletion.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ * @returns {Promise<void>}
+ */
 export async function deleteUser(
   req: Request,
   res: Response,

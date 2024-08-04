@@ -1,6 +1,6 @@
 today
-[] validate get user
 [] js doc
+[] validate get user
 day
 [] testing
 [] good function name

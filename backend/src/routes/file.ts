@@ -9,6 +9,7 @@ import {
 import { auth } from "../middleware/auth";
 
 const router = express();
+
 router.post("/", auth, createFile);
 router.get("/", auth, getFile);
 router.get("/:userId", auth, getUserFile);

@@ -1,15 +1,25 @@
 import bcrypt from "bcrypt";
+import ConflictError from "../error/ConflictError";
+import { ForbiddenError } from "../error/ForbiddenError";
 import NotFoundError from "../error/NotFoundError";
 import { UnauthorizeError } from "../error/UnauthorizedError";
 import { GetUserQueryPage, User } from "../interfaces/user";
 import * as UserModel from "../model/user";
-import ConflictError from "../error/ConflictError";
-import { ForbiddenError } from "../error/ForbiddenError";
 
+/**
+ * Creates a new user in the database.
+ * @param {User} user - The user object containing the user details.
+ * @returns {Promise<void>} A promise that resolves when the user is created.
+ */
 export function createUser(user: User) {
   return UserModel.UserModel.createUser(user);
 }
 
+/**
+ * Retrieves a paginated list of users based on the provided query.
+ * @param {GetUserQueryPage} query - The query parameters for pagination and filtering.
+ * @returns {Promise<{ data: User[]; meta: { page: number; limit: number; total: number; totalPages: number } }>} A promise that resolves with the user data and metadata.
+ */
 export async function getUsers(query: GetUserQueryPage) {
   const data = await UserModel.UserModel.getUsers(query);
   // this come as object
@@ -19,11 +29,17 @@ export async function getUsers(query: GetUserQueryPage) {
     page: query.page,
     limit: query.limit,
     total: +count.count,
-    totalPages
+    totalPages,
   };
   return { data, meta };
 }
 
+/**
+ * Retrieves a user by their ID.
+ * @param {string} id - The ID of the user to retrieve.
+ * @returns {Promise<User>} A promise that resolves with the user data.
+ * @throws {NotFoundError} If no user with the given ID is found.
+ */
 export function getUserById(id: string) {
   const data = UserModel.UserModel.getUserById(id);
   if (!data) {
@@ -31,14 +47,30 @@ export function getUserById(id: string) {
   }
   return data;
 }
+
+/**
+ * Retrieves a user by their email. Throws an error if the user exists.
+ * @param {string} email - The email of the user to retrieve.
+ * @returns {Promise<User>} A promise that resolves with the user data.
+ * @throws {ConflictError} If a user with the given email already exists.
+ */
 export async function getUserByEmail(email: string) {
   const data = await UserModel.UserModel.getUserByEmail(email);
   if (data) {
     throw new ConflictError(`Email alredy exist in database`);
   }
-  return data
+  return data;
 }
 
+/**
+ * Updates the password for a user. Throws an error if the old password is incorrect or if the user does not exist.
+ * @param {string} email - The email of the user whose password is to be updated.
+ * @param {string} oldPassword - The current password of the user.
+ * @param {string} newPassword - The new password to set.
+ * @returns {Promise<void>} A promise that resolves when the password is updated.
+ * @throws {NotFoundError} If no user with the given email is found.
+ * @throws {UnauthorizeError} If the old password is incorrect.
+ */
 export async function updatePassword(
   email: string,
   oldPassword: string,
@@ -56,6 +88,13 @@ export async function updatePassword(
   await UserModel.UserModel.updateUser(email, hashedNewPassword);
 }
 
+/**
+ * Deletes a user by their ID. Throws an error if the user is an admin or if no user is found.
+ * @param {string} id - The ID of the user to delete.
+ * @returns {Promise<void>} A promise that resolves when the user is deleted.
+ * @throws {NotFoundError} If no user with the given ID is found.
+ * @throws {ForbiddenError} If attempting to delete an admin user.
+ */
 export async function deleteUser(id: string) {
   const existingUser = await UserModel.UserModel.getUserById(id);
   if (!existingUser) {
@@ -65,10 +104,9 @@ export async function deleteUser(id: string) {
     const deleted = await UserModel.UserModel.deleteUser(id);
     return deleted;
   } catch (error) {
-    if (error.message === 'Cannot delete an admin user') {
-      throw new ForbiddenError('Cannot delete an admin user');
+    if (error.message === "Cannot delete an admin user") {
+      throw new ForbiddenError("Cannot delete an admin user");
     }
     throw error;
   }
-
 }

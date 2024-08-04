@@ -2,9 +2,15 @@ import { editor, suggestions } from ".";
 import { updateHighlighting } from "../highlight";
 import { ICompletionItem } from "../interface/lsp";
 import "../style.css";
+import { MovementDelta } from "../types/lsp";
 import { errorsDiv } from "./errors";
 export let selectedIndex = -1;
 export let currentCompletions: ICompletionItem[] = [];
+
+/**
+ * Displays the completion suggestions in the suggestions box.
+ * @param {ICompletionItem[]} completions - The list of completion items to display.
+ */
 export function showSuggestions(completions: ICompletionItem) {
   if (!Array.isArray(completions)) {
     console.error("Received invalid completion data:", completions);
@@ -38,6 +44,9 @@ export function showSuggestions(completions: ICompletionItem) {
   suggestions.style.display = "block";
 }
 
+/**
+ * Positions the suggestions box based on the editor's scroll and cursor position.
+ */
 export function positionSuggestions() {
   const rect = editor.getBoundingClientRect();
   const lineHeight = parseFloat(window.getComputedStyle(editor).lineHeight);
@@ -57,7 +66,10 @@ export function positionSuggestions() {
   suggestions.style.left = `${left}px`;
   suggestions.style.top = `${top}px`;
 }
-type MovementDelta = -1 | 1;
+/**
+ * Moves the selection of the suggestion box up or down.
+ * @param {MovementDelta} delta - The direction to move the selection. `-1` for up, `1` for down.
+ */
 export function moveSelection(delta: MovementDelta) {
   const items = suggestions.querySelectorAll("div");
   if (items.length === 0) return;
@@ -73,8 +85,11 @@ export function moveSelection(delta: MovementDelta) {
   });
 }
 
+/**
+ * Applies the selected suggestion to the editor.
+ * @param {string} name - The name of the suggestion to apply.
+ */
 export function applySuggestion(name: string) {
-  console.log("it comes here suu");
   const currentValue = editor.value;
   const cursorPosition = editor.selectionStart;
   const beforeCursor = currentValue.substring(0, cursorPosition);
@@ -106,6 +121,9 @@ export function applySuggestion(name: string) {
   clearErrors();
 }
 
+/**
+ * Clears all displayed errors.
+ */
 export function clearErrors() {
   errorsDiv.style.display = "none";
   errorsDiv.innerHTML = "";

@@ -38,11 +38,21 @@ editor.addEventListener("input", () => {
   positionSuggestions();
 });
 
-//error diagnostics
+/**
+ * Handles error diagnostics received from the server.
+ * Displays errors in the `errorsDiv` element.
+ * @param {IDiagnosticError[]} diagnostics - The list of diagnostic errors.
+ */
 socket.on("diagnostics", (diagnostics) => {
   showErrors(diagnostics);
 });
 
+/**
+ * Handles completion suggestions received from the server.
+ * Displays suggestions in the `suggestions` element.
+ *
+ * @param {any} data - The completion data from the server.
+ */
 socket.on("completion", (data) => {
   let entries;
   if (Array.isArray(data)) {

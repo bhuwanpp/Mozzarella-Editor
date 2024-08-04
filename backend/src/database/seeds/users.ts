@@ -5,7 +5,6 @@ const TABLE_NAME = "users";
 
 /**
  * Delete existing entries and seed values for table TABLE_NAME.
- *
  * @param   {Knex} knex
  * @returns {Promise}
  */
@@ -27,13 +26,15 @@ export function seed(knex: Knex): Promise<void> {
           password:
             "$2b$10$bCx2uxbLx7IObbO9yLo/pOX7wCCOk6SSgSmIheesP3uDMKPfy8YlW",
           role: ROLE.USER,
-        }, {
+        },
+        {
           name: "normal User",
           email: "three@gmail.com",
           password:
             "$2b$10$bCx2uxbLx7IObbO9yLo/pOX7wCCOk6SSgSmIheesP3uDMKPfy8YlW",
           role: ROLE.USER,
-        }, ,
+        },
+        ,
       ]);
     });
 }

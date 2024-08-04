@@ -8,6 +8,10 @@ export const highlightedCode = document.getElementById(
   "highlighted-code"
 ) as HTMLPreElement;
 const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
+
+/**
+ * Updates the syntax highlighting of the code in the textarea.
+ */
 export function updateHighlighting() {
   let code = textarea.value;
   const highlightedHTML = Prism.highlight(
@@ -17,15 +21,22 @@ export function updateHighlighting() {
   );
   highlightedCode.innerHTML = highlightedHTML + "\n";
 
+  // Synchronize scroll position between the textarea and highlighted code
   highlightedCode.scrollTop = textarea.scrollTop;
   highlightedCode.scrollLeft = textarea.scrollLeft;
 }
 
+/**
+ * Adjusts the height of the textarea to fit its content.
+ */
 export function resizeTextarea() {
   textarea.style.height = "auto";
   textarea.style.height = textarea.scrollHeight + "px";
 }
 
+/**
+ * Updates the position and height of the highlight div based on the current selection.
+ */
 export const handleSelectionChange = () => {
   if (document.activeElement === textarea) {
     const start = textarea.selectionStart;

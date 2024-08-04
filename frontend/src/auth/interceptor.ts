@@ -13,6 +13,10 @@ const api: AxiosInstance = axios.create({
 });
 let authCheckInterval: NodeJS.Timeout | null = null;
 
+/**
+ * Initializes authentication status check on window load.
+ * If the user is logged in, starts periodic authentication status checks.
+ */
 window.addEventListener("load", async () => {
   const isLoggedIn = await checkAuthStatus();
   if (isLoggedIn) {
@@ -20,13 +24,20 @@ window.addEventListener("load", async () => {
   }
 });
 
-// todo  not working access token expires
+/**
+ * Logs out the user and alerts that the session has expired.
+ * This function should be called when a session expires.
+ */
 const sessionExpiredLogout = () => {
-  console.log("it comes here ");
   alert("Your session has expired. Please log in again.");
   logOutFunction();
 };
 
+/**
+ * Refreshes the access token using the refresh token stored in localStorage.
+ * @returns {Promise<string>} The new access token.
+ * @throws {Error} If no refresh token is available or if the refresh request fails.
+ */
 const refreshToken = async (): Promise<string> => {
   const userCredentials = JSON.parse(
     localStorage.getItem("userCredentials") || "{}"
@@ -55,7 +66,8 @@ const refreshToken = async (): Promise<string> => {
     throw error;
   }
 };
-// request interceptor
+
+// Request interceptor to add the access token to the headers
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const userCredentials = JSON.parse(
@@ -71,7 +83,7 @@ api.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// response interceptor
+// Response interceptor to handle token expiration and retry requests
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
@@ -95,7 +107,6 @@ api.interceptors.response.use(
           "userCredentials",
           JSON.stringify(userCredentials)
         );
-        console.log("New access token obtained and stored:", newAccessToken);
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
@@ -108,6 +119,11 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * Checks the authentication status of the user by making a request to the /auth/status endpoint.
+ * @returns {Promise<boolean>} True if the user is authenticated, false otherwise.
+ */
 async function checkAuthStatus() {
   const accessToken = getAccessToken();
   if (!accessToken) {
@@ -130,19 +146,28 @@ async function checkAuthStatus() {
     return false;
   }
 }
-// check after  every 5 minutes
+
+/**
+ * Starts periodic checks of authentication status.
+ * @param {number} interval The interval time in milliseconds for checking authentication status (default is 15000ms).
+ * @returns {NodeJS.Timeout} The interval ID.
+ */
 function startAuthStatusCheck(interval = 15000) {
   return setInterval(checkAuthStatus, interval);
 }
 
-// Function to call when user logs in
+/**
+ * Initializes the authentication status check interval after user login.
+ */
 export function onUserLogin() {
   if (!authCheckInterval) {
     authCheckInterval = startAuthStatusCheck();
   }
 }
 
-// Function to call when user logs out
+/**
+ * Clears the authentication status check interval after user logout.
+ */
 export function onUserLogout() {
   if (authCheckInterval) {
     clearInterval(authCheckInterval);

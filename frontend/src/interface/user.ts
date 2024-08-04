@@ -37,3 +37,10 @@ export interface ILocalUser {
   refreshtoken: string;
   name: string;
 }
+
+export interface PaginationMeta {
+  page: number;
+  size: number;
+  total: number;
+  totalPages: number;
+}
