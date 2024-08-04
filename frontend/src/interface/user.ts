@@ -1,4 +1,4 @@
-export interface User {
+export interface IUser {
   email: string;
   password: string;
 }
@@ -8,8 +8,32 @@ export interface INewUser {
   password: string;
 }
 
+export interface IUserId {
+  userId: string;
+  name: string;
+  email: string;
+}
+
 export interface IupdateUser {
   email: string;
   oldPassword: string;
   newPassword: string;
+}
+
+export interface IFileData {
+  fileName: string;
+  fileData: string;
+}
+
+export interface IUserFile {
+  data: IFileData[];
+}
+export interface IErrorResponse {
+  message: string;
+}
+
+export interface ILocalUser {
+  accesstoken: string;
+  refreshtoken: string;
+  name: string;
 }

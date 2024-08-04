@@ -69,7 +69,8 @@ export async function refresh(req: Request, res: Response) {
     return;
   }
 
-  verify(token[1], config.jwt.secret!, (error, data) => {
+  const refreshToken = token[1];
+  verify(refreshToken, config.jwt.secret!, (error, data) => {
     if (error) {
       res.status(HttpStatusCodes.NOT_FOUND).json({
         error: error.message,
@@ -78,9 +79,11 @@ export async function refresh(req: Request, res: Response) {
 
     if (typeof data !== "string" && data) {
       const payload = {
-        id: data.id,
+        userId: data.userId,
         name: data.name,
         email: data.email,
+        role: data.role
+
       };
       // create new accessToken
       const accessToken = sign(payload, config.jwt.secret!);

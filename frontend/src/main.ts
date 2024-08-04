@@ -1,3 +1,5 @@
+import "./style.css";
+
 import {
   AfterLoginFunction,
   loginBackFunction,
@@ -12,6 +14,7 @@ import {
   registerUser,
   updatePasswordFunction,
 } from "./auth/login";
+import { showAllUsersFunction } from "./auth/user";
 import { astAutoComplete } from "./editor/autoComplete";
 import { runCode } from "./editor/codeRunner";
 import {
@@ -23,8 +26,15 @@ import {
   saveFile,
 } from "./editor/fileOperations";
 import { updateLineNumbers } from "./editor/lineNumbers";
-import { resizeTextarea, updateHighlighting } from "./highlight";
+import {
+  handleSelectionChange,
+  highlightedCode,
+  resizeTextarea,
+  updateHighlighting,
+} from "./highlight";
+import { suggestions } from "./lsp";
 import { errorsDiv } from "./lsp/errors";
+
 const singnUpBtn = document.getElementById("signupBtn") as HTMLButtonElement;
 const loginBack = document.getElementById("loginback") as HTMLButtonElement;
 export const afterLogin = document.getElementById(
@@ -34,10 +44,6 @@ export const afterLoginUI = document.getElementById(
   "afterLoginUI"
 ) as HTMLButtonElement;
 export const logOut = document.getElementById("logOut") as HTMLButtonElement;
-
-import { showAllUsersFunction } from "./auth/user";
-import { suggestions } from "./lsp";
-import "./style.css";
 export const addFileBtn = document.getElementById(
   "add-file"
 ) as HTMLButtonElement;
@@ -58,7 +64,6 @@ const updatePasswordForm = document.getElementById(
 const updatePasswordBtn = document.getElementById(
   "updatePasswordBtn"
 ) as HTMLButtonElement;
-
 export const textArea = document.getElementById(
   "textarea"
 ) as HTMLTextAreaElement;
@@ -72,10 +77,11 @@ const newPassword = document.getElementById("newPassword") as HTMLInputElement;
 export const showUsersUI = document.getElementById(
   "showUsersUI"
 ) as HTMLDivElement;
-export const showAllUsersBtn = document.createElement("button");
 
+export const showAllUsersBtn = document.createElement("button");
 let loginUiVisible = false;
 let afterloginVisible = false;
+
 // escape  key press
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   if (e.key === "Escape") {
@@ -87,6 +93,7 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
     removeLogin();
   }
 });
+
 document.addEventListener("click", (event) => {
   const target = event.target as Node;
   if (loginUiVisible && !loginUi.contains(target) && target !== loginBtn) {
@@ -109,17 +116,35 @@ document.addEventListener("click", (event) => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+  updateHighlighting();
+  resizeTextarea();
+});
+
+document.addEventListener("selectionchange", handleSelectionChange);
+
 // text area input
 textArea.addEventListener("input", () => {
   updateLineNumbers();
   saveFile(currentFileName, textArea.value);
   updateHighlighting();
   resizeTextarea();
+  handleSelectionChange();
 });
 
 // auto complete
-textArea.addEventListener("keydown", (e) => {
+textArea.addEventListener("keydown", async (e) => {
   astAutoComplete(e);
+  if (e.ctrlKey && e.key === "Enter") {
+    e.preventDefault();
+    await runCode();
+  }
+});
+
+// highlight
+textArea.addEventListener("scroll", function () {
+  highlightedCode.scrollTop = textArea.scrollTop;
+  highlightedCode.scrollLeft = textArea.scrollLeft;
 });
 
 // to run code
@@ -127,14 +152,6 @@ runBtn.addEventListener("click", async () => {
   await runCode();
 });
 
-textArea.addEventListener("keydown", async (e) => {
-  if (e.ctrlKey && e.key === "Enter") {
-    e.preventDefault();
-    await runCode();
-  }
-});
-
-// add
 const lightMode = document.getElementById("light");
 const darkMode = document.getElementById("dark");
 
@@ -174,8 +191,6 @@ loginBtn.addEventListener("click", () => {
   resetFunction();
 });
 
-AfterLoginFunction();
-
 afterLogin.addEventListener("click", () => {
   afterloginVisible = !afterloginVisible;
   afterLoginUI.style.display = afterloginVisible ? "block" : "none";
@@ -213,11 +228,17 @@ form.addEventListener("submit", async (e) => {
   try {
     await loginUser(user);
     form.reset();
-  } catch (error: any) {
-    console.log(error);
-    loginError.textContent = error.message;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      loginError.textContent = error.message;
+    } else {
+      console.error("Unexpected error:", error);
+      loginError.textContent = "An unexpected error occurred.";
+    }
   }
 });
+
 // signup user
 signup.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -257,6 +278,8 @@ updatePassword.addEventListener("click", async (e) => {
   }
 });
 
+// function call declaration
+AfterLoginFunction();
 addFileBtn.addEventListener("click", () => addFile());
 updateLineNumbers();
 initializeLocalStorage();

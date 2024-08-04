@@ -13,7 +13,7 @@ import { getUserQuerySchema, paramSchema } from "../schema/user";
 const router = express();
 router.get(
   "/",
-  validateReqQuery(getUserQuerySchema),
+  // validateReqQuery(getUserQuerySchema),
   auth,
   authorize(ROLE.ADMIN),
   getUsers

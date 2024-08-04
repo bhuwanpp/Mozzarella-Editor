@@ -13,4 +13,5 @@ export interface GetUserQuery {
 export interface GetUserQueryPage extends GetUserQuery {
   page?: number;
   size?: number;
+  limit?: number
 }

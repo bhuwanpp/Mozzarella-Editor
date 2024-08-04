@@ -25,6 +25,7 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
   // verify is checking it expire or not
   try {
     const user = verify(token[1], config.jwt.secret!) as User;
+    console.log('user in auth', user)
     req.user = user;
 
   } catch (error) {
@@ -59,7 +60,6 @@ export const verifyUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("it comes here");
   const { authorization } = req.headers;
   if (!authorization) {
     next(new UnauthenticatedError("Access token required"));
@@ -71,7 +71,6 @@ export const verifyUser = async (
     return;
   }
   try {
-    console.log("it comes in try block");
     const playload = jwt.verify(token[1], config.jwt.secret!) as User;
 
     const user = await getUserById(playload.userId);

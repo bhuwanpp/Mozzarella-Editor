@@ -28,11 +28,12 @@ export class UserModel extends BaseModel {
 
   static getUsers(filter: GetUserQueryPage) {
     const { q } = filter;
+    console.log(filter.page)
     const query = this.queryBuilder()
       .select("userId", "name", "email")
       .table("users")
-      .limit(filter.size)
-      .offset((filter.page - 1) * filter.size);
+      .limit(filter.limit)
+      .offset((filter.page - 1) * filter.limit);
     if (q) {
       query.whereLike("name", `%${q}%`);
     }

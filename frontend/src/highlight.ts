@@ -4,42 +4,29 @@ import "prismjs/themes/prism.css";
 import "./style.css";
 
 const textarea = document.getElementById("textarea") as HTMLTextAreaElement;
-const highlightedCode = document.getElementById(
+export const highlightedCode = document.getElementById(
   "highlighted-code"
 ) as HTMLPreElement;
-
+const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
 export function updateHighlighting() {
-  const code = textarea.value;
+  let code = textarea.value;
   const highlightedHTML = Prism.highlight(
     code,
     Prism.languages.javascript,
     "javascript"
   );
   highlightedCode.innerHTML = highlightedHTML + "\n";
+
   highlightedCode.scrollTop = textarea.scrollTop;
   highlightedCode.scrollLeft = textarea.scrollLeft;
 }
 
 export function resizeTextarea() {
+  textarea.style.height = "auto";
   textarea.style.height = textarea.scrollHeight + "px";
 }
 
-textarea.addEventListener("input", () => {
-  updateHighlighting();
-  resizeTextarea();
-});
-
-textarea.addEventListener("scroll", function () {
-  highlightedCode.scrollTop = textarea.scrollTop;
-  highlightedCode.scrollLeft = textarea.scrollLeft;
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  updateHighlighting();
-});
-
-const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
-const handleSelectionChange = () => {
+export const handleSelectionChange = () => {
   if (document.activeElement === textarea) {
     const start = textarea.selectionStart;
     const textBefore = textarea.value.substring(0, start);
@@ -53,6 +40,3 @@ const handleSelectionChange = () => {
     highlightDiv.style.height = `${lineHeight}px`;
   }
 };
-
-document.addEventListener("selectionchange", handleSelectionChange);
-textarea.addEventListener("input", handleSelectionChange);

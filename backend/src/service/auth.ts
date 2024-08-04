@@ -42,16 +42,16 @@ export async function login(body: Pick<User, "email" | "password">) {
     expiresIn: config.jwt.acccessTokenExpiraryMS,
   });
 
-  const refresthToken = await sign(payload, config.jwt.secret!, {
+  const refreshToken = await sign(payload, config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiraryMS,
   });
 
   const name = existingUser.name;
   const roleId = existingUser.roleId;
+  console.log(refreshToken)
   return {
     name,
-    roleId,
     accessToken,
-    refresthToken,
+    refreshToken,
   };
 }

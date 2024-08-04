@@ -5,6 +5,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import { getAccessToken } from "../editor/fileOperations";
+import { HTTPSSTATUS } from "../enums/httpStatus";
 import { logOutFunction } from "./login";
 
 const api: AxiosInstance = axios.create({
@@ -21,6 +22,7 @@ window.addEventListener("load", async () => {
 
 // todo  not working access token expires
 const sessionExpiredLogout = () => {
+  console.log("it comes here ");
   alert("Your session has expired. Please log in again.");
   logOutFunction();
 };
@@ -29,7 +31,7 @@ const refreshToken = async (): Promise<string> => {
   const userCredentials = JSON.parse(
     localStorage.getItem("userCredentials") || "{}"
   );
-  const { refreshToken } = userCredentials;
+  const [, refreshToken] = userCredentials;
 
   if (!refreshToken) {
     throw new Error("No refresh token available");
@@ -48,22 +50,18 @@ const refreshToken = async (): Promise<string> => {
     );
     const newAccessToken = response.data.accessToken;
 
-    userCredentials.accessToken = newAccessToken;
-    localStorage.setItem("userCredentials", JSON.stringify(userCredentials));
-
     return newAccessToken;
   } catch (error) {
     throw error;
   }
 };
-
 // request interceptor
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const userCredentials = JSON.parse(
       localStorage.getItem("userCredentials") || "{}"
     );
-    const { accessToken } = userCredentials;
+    const [accessToken] = userCredentials;
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -89,6 +87,15 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const newAccessToken = await refreshToken();
+        const userCredentials = JSON.parse(
+          localStorage.getItem("userCredentials") || "{}"
+        );
+        userCredentials[0] = newAccessToken;
+        localStorage.setItem(
+          "userCredentials",
+          JSON.stringify(userCredentials)
+        );
+        console.log("New access token obtained and stored:", newAccessToken);
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
@@ -114,14 +121,17 @@ async function checkAuthStatus() {
     });
     return true;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      logOutFunction();
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === HTTPSSTATUS.Unauthorized
+    ) {
+      // logOutFunction();
     }
     return false;
   }
 }
 // check after  every 5 minutes
-function startAuthStatusCheck(interval = 310000) {
+function startAuthStatusCheck(interval = 15000) {
   return setInterval(checkAuthStatus, interval);
 }
 

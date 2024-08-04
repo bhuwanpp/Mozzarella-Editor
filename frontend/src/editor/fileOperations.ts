@@ -1,8 +1,16 @@
 import axios from "axios";
 import api from "../auth/interceptor";
+import {
+  BOTTOM_OFFSET,
+  LEFT_OFFSET,
+  MID_SCREEN_OFFSET,
+  SMALL_SCREEN_OFFSET,
+} from "../constants/file";
+import { HTTPSSTATUS } from "../enums/httpStatus";
 import { updateHighlighting } from "../highlight";
 import { addFileBtn, textArea } from "../main";
 import { lineNumbers, updateLineNumbers } from "./lineNumbers";
+
 const filesWrapper = document.getElementById("files") as HTMLDivElement;
 const whiteLine = document.getElementById("whiteLine") as HTMLParagraphElement;
 
@@ -10,7 +18,6 @@ export const defaultFileName = "index.js";
 const defaultFileData =
   '// Your JavaScript code here \nconsole.log("Hello, Mozzarella!")';
 export let currentFileName = defaultFileName;
-let fileCounter = 1;
 
 export const getAccessToken = (): string | null => {
   const userCredentials = localStorage.getItem("userCredentials");
@@ -120,8 +127,19 @@ const updateWhiteLinePosition = (
   const buttonWrapperRect = buttonWrapper.getBoundingClientRect();
   const fileNameRect = fileNameText.getBoundingClientRect();
   whiteLine.style.width = `${buttonWrapperRect.width + fileNameRect.width}px`;
-  whiteLine.style.top = `${rect.bottom - 86}px`;
-  whiteLine.style.left = `${fileNameRect.left - 40}px`;
+
+  whiteLine.style.top = `${rect.bottom - BOTTOM_OFFSET}px`;
+  whiteLine.style.left = `${fileNameRect.left - LEFT_OFFSET}px`;
+  const isMidScreen = window.innerWidth < 737;
+  if (isMidScreen) {
+    console.log("it comes hre rect top ");
+    whiteLine.style.top = `${rect.bottom - MID_SCREEN_OFFSET}px`;
+  }
+  const isSmallScreen = window.innerWidth < 412;
+  if (isSmallScreen) {
+    console.log("it comes hre rect top ");
+    whiteLine.style.top = `${rect.bottom - SMALL_SCREEN_OFFSET}px`;
+  }
 };
 
 export const loadFile = (fileName: string | null) => {
@@ -206,7 +224,10 @@ export const fetchFilesFromBackend = async () => {
       loadFirstFile();
       updateHighlighting();
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.status === HTTPSSTATUS.Unauthorized
+      ) {
         console.log("Token might be expired, attempting to refresh...");
       }
     }
@@ -218,11 +239,14 @@ export const fetchFilesFromBackend = async () => {
 };
 
 export const addFile = async () => {
-  const fileName = `script${fileCounter}.js`;
+  const jsFiles = Object.keys(localStorage).filter((key) =>
+    key.endsWith(".js")
+  );
+  const fileCount = jsFiles.length;
+  const fileName = `script${fileCount + 1}.js`;
   const fileData = '// Your JavaScript code here \nconsole.log("new file")';
   await saveFile(fileName, fileData);
   createFileButton(fileName);
-  fileCounter++;
   loadFile(fileName);
 };
 

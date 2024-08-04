@@ -1,7 +1,7 @@
 import { resizeTextarea, updateHighlighting } from "../highlight";
 import { textArea } from "../main";
 
-export function astAutoComplete(event: any) {
+export function astAutoComplete(event: KeyboardEvent) {
   const char = event.key;
 
   if (["(", "{", "[", '"', "'", "`"].includes(char)) {

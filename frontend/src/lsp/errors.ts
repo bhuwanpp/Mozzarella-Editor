@@ -1,6 +1,8 @@
+import { IDiagnosticError } from "../interface/lsp";
+
 export const errorsDiv = document.getElementById("errors") as HTMLDivElement;
 
-export function showErrors(diagnostics: any) {
+export function showErrors(diagnostics: IDiagnosticError[]) {
   if (Object.keys(diagnostics).length >= 1) {
     errorsDiv.style.display = "block";
   } else {
@@ -15,7 +17,7 @@ export function showErrors(diagnostics: any) {
     errorsDiv.style.display = "none";
   });
 
-  diagnostics.forEach((error: any) => {
+  diagnostics.forEach((error: IDiagnosticError) => {
     const errorDiv = document.createElement("div");
     errorDiv.textContent = `Error (${error.code}): ${error.text} at line ${error.start.line}, column ${error.start.offset}`;
     errorsDiv.appendChild(errorDiv);

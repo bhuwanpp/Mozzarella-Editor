@@ -4,8 +4,8 @@ const config = {
   port: process.env.PORT,
   jwt: {
     secret: process.env.JWT_SECRET,
-    acccessTokenExpiraryMS: +process.env.ACCESS_TOKEN_EXPIRY_MS,
-    refreshTokenExpiraryMS: +process.env.REFRESH_TOKEN_EXPIRY_MS,
+    acccessTokenExpiraryMS: +process.env.ACCESS_TOKEN_EXPIRY_S,
+    refreshTokenExpiraryMS: +process.env.REFRESH_TOKEN_EXPIRY_S,
   },
   database: {
     client: process.env.DB_CLIENT,

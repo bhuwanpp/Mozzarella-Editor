@@ -1,4 +1,5 @@
 import { textArea } from "../main";
+import { ConsoleMethod } from "../types/codeRun";
 
 const output = document.getElementById("output") as HTMLParagraphElement;
 
@@ -16,12 +17,7 @@ export const runCode = async () => {
   document.body.appendChild(iframe);
 
   const iframeWindow = iframe.contentWindow as Window & { console: Console };
-  const consoleMethods: Array<"log" | "error" | "warn" | "info"> = [
-    "log",
-    "error",
-    "warn",
-    "info",
-  ];
+  const consoleMethods: ConsoleMethod[] = ["log", "error", "warn", "info"];
 
   consoleMethods.forEach((method) => {
     iframeWindow.console[method] = (...args: any[]) => {

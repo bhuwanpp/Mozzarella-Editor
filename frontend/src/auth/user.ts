@@ -1,20 +1,26 @@
 import axios from "axios";
 import Prism from "prismjs";
 import { getAccessToken } from "../editor/fileOperations";
+import { IUserFile, IUserId } from "../interface/user";
 
+let currentPage = 1;
+const usersPerPage = 10;
 // show all user function
-export async function showAllUsersFunction() {
+export async function showAllUsersFunction(page = 1) {
   const accessToken = getAccessToken();
   try {
-    const response = await axios.get("http://localhost:3000/users", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const users = response.data.data;
-    updateUserUI(users);
+    const response = await axios.get(
+      `http://localhost:3000/users?page=${page}&limit=${usersPerPage}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const { data: users, meta } = response.data;
+    console.log(meta);
+    updateUserUI(users, meta);
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
@@ -22,7 +28,10 @@ export async function showAllUsersFunction() {
 }
 
 // update  users
-async function updateUserUI(users: any[]) {
+async function updateUserUI(
+  users: IUserId[],
+  meta: { page: number; size: number; total: number; totalPages: number }
+) {
   const showUsersUI = document.getElementById("showUsersUI");
 
   if (showUsersUI) {
@@ -39,7 +48,21 @@ async function updateUserUI(users: any[]) {
             )
             .join("")}
         </ul>
+              <div class="pagination pt-10">
+        ${
+          meta.page > 1
+            ? `<button id="prevPage" class="bg-blue-400 px-2 py-1 rounded-md">Previous</button>`
+            : ""
+        }
+        <span>Page ${meta.page} of ${meta.totalPages}</span>
+        ${
+          meta.page < meta.totalPages
+            ? `<button id="nextPage" class="bg-blue-400 px-2 py-1 rounded-md">Next</button>`
+            : ""
+        }
+      </div>
       `;
+
     // Add event listeners to each list item
     const userItems = showUsersUI.querySelectorAll(".ulUsers");
     userItems.forEach((item) => {
@@ -55,11 +78,13 @@ async function updateUserUI(users: any[]) {
         }
       });
     });
+
     // Add event listeners to delete buttons
     const deleteButtons = showUsersUI.querySelectorAll(".delete-btn");
     deleteButtons.forEach((button) => {
-      button.addEventListener("click", async () => {
+      button.addEventListener("click", async (event) => {
         const userId = button.getAttribute("data-user-id");
+        event.stopPropagation();
         if (userId) {
           const isConfirmed = window.confirm(
             "Are you sure you want to delete this user?"
@@ -69,7 +94,7 @@ async function updateUserUI(users: any[]) {
             try {
               await deleteUser(userId);
               console.log("it comes here admin delete ");
-              showAllUsersFunction();
+              showAllUsersFunction(currentPage);
             } catch (error) {
               alert("you cannot delete to self or admin");
               console.error("Error deleting user file:", error);
@@ -78,6 +103,24 @@ async function updateUserUI(users: any[]) {
         }
       });
     });
+    const prevButton = document.getElementById("prevPage");
+    const nextButton = document.getElementById("nextPage");
+    if (prevButton) {
+      prevButton.addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage--;
+          showAllUsersFunction(currentPage);
+        }
+      });
+    }
+    if (nextButton) {
+      nextButton.addEventListener("click", () => {
+        if (currentPage < meta.totalPages) {
+          currentPage++;
+          showAllUsersFunction(currentPage);
+        }
+      });
+    }
   }
 }
 
@@ -99,7 +142,7 @@ async function fetchUserFile(userId: string) {
 }
 
 // escape html
-function escapeHtml(unsafe: any) {
+function escapeHtml(unsafe: string) {
   return unsafe
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -109,13 +152,13 @@ function escapeHtml(unsafe: any) {
 }
 
 // display user file
-function displayUserFile(userFile: any) {
+function displayUserFile(userFile: IUserFile) {
   const showUsersUI = document.getElementById("showUsersUI");
 
   if (showUsersUI) {
     const fileContents = userFile.data
       .map(
-        (file: any) =>
+        (file) =>
           `<div>
           <h3 class = "pt-1"> file-name: ${file.fileName}</h3>
           <pre><code class="language-js pt-1"> file-code: ${escapeHtml(

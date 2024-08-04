@@ -14,10 +14,12 @@ export async function getUsers(query: GetUserQueryPage) {
   const data = await UserModel.UserModel.getUsers(query);
   // this come as object
   const count = await UserModel.UserModel.count(query);
+  const totalPages = Math.ceil(count.count / query.limit);
   const meta = {
     page: query.page,
-    size: data.length,
+    limit: query.limit,
     total: +count.count,
+    totalPages
   };
   return { data, meta };
 }

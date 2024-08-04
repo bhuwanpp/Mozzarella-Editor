@@ -48,10 +48,14 @@ export function removeLogin() {
 }
 
 export function AfterLoginFunction() {
-  const userCredentialsString: any = localStorage.getItem("userCredentials");
+  const userCredentialsString = localStorage.getItem("userCredentials");
   if (userCredentialsString) {
-    const userCredentials: any = JSON.parse(userCredentialsString);
-    const name = userCredentials[2];
+    const userCredentials = JSON.parse(userCredentialsString) as [
+      string,
+      string,
+      string
+    ];
+    const name: string = userCredentials[2];
     loginBtn.style.display = "none";
     afterLogin.style.display = "block";
     afterLogin.textContent = name;

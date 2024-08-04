@@ -10,8 +10,8 @@ export async function getUsers(
   req: Request<any, any, any, GetUserQuery>,
   res: Response
 ) {
-  const { body } = req;
-  const data = await UserService.getUsers(body);
+  const query = req.query;
+  const data = await UserService.getUsers(query);
   logger.info("Called getUsers");
   res.status(HttpStatusCodes.OK).json(data);
 }

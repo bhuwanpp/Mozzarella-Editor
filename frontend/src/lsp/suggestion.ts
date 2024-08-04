@@ -1,10 +1,11 @@
 import { editor, suggestions } from ".";
 import { updateHighlighting } from "../highlight";
+import { ICompletionItem } from "../interface/lsp";
 import "../style.css";
 import { errorsDiv } from "./errors";
 export let selectedIndex = -1;
-export let currentCompletions: any[] = [];
-export function showSuggestions(completions: any) {
+export let currentCompletions: ICompletionItem[] = [];
+export function showSuggestions(completions: ICompletionItem) {
   if (!Array.isArray(completions)) {
     console.error("Received invalid completion data:", completions);
     return;
@@ -13,7 +14,7 @@ export function showSuggestions(completions: any) {
   const code = editor.value.substring(0, cursorPosition);
   const lastWord = code.split(/\s|\./).pop() || "";
 
-  currentCompletions = completions.filter((item: any) =>
+  currentCompletions = completions.filter((item) =>
     item.name.toLowerCase().startsWith(lastWord.toLowerCase())
   );
 
@@ -24,10 +25,10 @@ export function showSuggestions(completions: any) {
     return;
   }
 
-  currentCompletions.forEach((item: any, index: any) => {
+  currentCompletions.forEach((item, index) => {
     const div = document.createElement("div");
     div.textContent = `${item.name} (${item.kind})`;
-    div.dataset.index = index;
+    div.dataset.index = String(index);
     div.onclick = () => {
       applySuggestion(item.name);
     };
@@ -43,7 +44,7 @@ export function positionSuggestions() {
   const charWidth = 8;
   const offset = 45;
 
-  const lines = editor.value.substr(0, editor.selectionStart).split("\n");
+  const lines = editor.value.substring(0, editor.selectionStart).split("\n");
   const currentLineNumber = lines.length;
   const currentColumnNumber = lines[lines.length - 1].length;
 
@@ -56,8 +57,8 @@ export function positionSuggestions() {
   suggestions.style.left = `${left}px`;
   suggestions.style.top = `${top}px`;
 }
-
-export function moveSelection(delta: any) {
+type MovementDelta = -1 | 1;
+export function moveSelection(delta: MovementDelta) {
   const items = suggestions.querySelectorAll("div");
   if (items.length === 0) return;
 
@@ -90,10 +91,10 @@ export function applySuggestion(name: string) {
   }
 
   editor.value = newValue;
-  console.log(newValue);
   const newCursorPosition = newValue.length - afterCursor.length;
   editor.setSelectionRange(newCursorPosition, newCursorPosition);
   editor.focus();
+
   // Hide suggestions
   suggestions.style.display = "none";
   currentCompletions = [];
