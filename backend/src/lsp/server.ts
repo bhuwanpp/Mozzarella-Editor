@@ -1,27 +1,38 @@
 // server.ts
-import { spawn } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 import cors from "cors";
 import express from "express";
 import http from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 
 const app = express();
 app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   console.log("A user connected");
+
+  // Spawn a TypeScript server process
   const tsServer = spawn("tsserver", ["--stdio"]);
   let buffer = "";
   let seq = 0;
 
-  tsServer.stdout.on("data", (data) => {
+  // Handle data received from TypeScript server
+  tsServer.stdout.on("data", (data: Buffer) => {
     buffer += data.toString();
     let newlineIndex;
     while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
@@ -46,10 +57,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  tsServer.stderr.on("data", (data) => {
+  // Handle errors from TypeScript server
+  tsServer.stderr.on("data", (data: Buffer) => {
     console.error(`TypeScript Server Error: ${data}`);
   });
 
+  // Handle incoming code updates from clients
   socket.on("codeUpdate", (code: string) => {
     console.log("Received code update:", code);
     sendOpenRequest(tsServer, code);
@@ -57,12 +70,18 @@ io.on("connection", (socket) => {
     sendDiagnosticsRequest(tsServer);
   });
 
+  // Handle client disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected");
     tsServer.kill();
   });
 
-  function sendOpenRequest(tsServer: any, code: string) {
+  /**
+   * Sends an open request to the TypeScript server to open a virtual file.
+   * @param tsServer - The TypeScript server process.
+   * @param code - The code content to be sent.
+   */
+  function sendOpenRequest(tsServer: ChildProcess, code: string) {
     const openRequest = {
       seq: seq++,
       type: "request",
@@ -76,7 +95,12 @@ io.on("connection", (socket) => {
     tsServer.stdin.write(JSON.stringify(openRequest) + "\n");
   }
 
-  function sendCompletionRequest(tsServer: any, code: string) {
+  /**
+   * Sends a completion request to the TypeScript server to get code completions.
+   * @param tsServer - The TypeScript server process.
+   * @param code - The code content to be used for completion.
+   */
+  function sendCompletionRequest(tsServer: ChildProcess, code: string) {
     const completionRequest = {
       seq: seq++,
       type: "request",
@@ -91,7 +115,11 @@ io.on("connection", (socket) => {
     tsServer.stdin.write(JSON.stringify(completionRequest) + "\n");
   }
 
-  function sendDiagnosticsRequest(tsServer: any) {
+  /**
+   * Sends a diagnostics request to the TypeScript server to get semantic diagnostics.
+   * @param tsServer - The TypeScript server process.
+   */
+  function sendDiagnosticsRequest(tsServer: ChildProcess) {
     const diagnosticsRequest = {
       seq: seq++,
       type: "request",
@@ -103,6 +131,6 @@ io.on("connection", (socket) => {
 });
 
 const PORT = 8080;
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(` lsp Server running on port ${PORT}`);
 });

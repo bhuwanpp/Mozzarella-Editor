@@ -9,6 +9,12 @@ import { User } from "../interfaces/user";
 import { getUserById } from "../service/user";
 import { ApiResponse } from "../utils/apiResponse";
 
+/**
+ * Middleware to authenticate a user based on a JWT token.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next middleware function.
+ */
 export function auth(req: Request, res: Response, next: NextFunction): void {
   const { authorization } = req.headers;
 
@@ -25,6 +31,7 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
   // verify is checking it expire or not
   try {
     const user = verify(token[1], config.jwt.secret!) as User;
+    console.log("user in auth", user);
     req.user = user;
   } catch (error) {
     next(new UnauthenticatedError("Unauthenticated"));
@@ -32,6 +39,11 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
   next();
 }
 
+/**
+ * Middleware to authorize a user based on their role.
+ * @param role - A single role or an array of roles to check against the user's role.
+ * @returns A middleware function that checks if the user has the required role.
+ */
 export function authorize(role: ROLE | ROLE[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
@@ -53,12 +65,17 @@ export function authorize(role: ROLE | ROLE[]) {
   };
 }
 
+/**
+ * Middleware to verify a user and ensure they have an admin role.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next middleware function.
+ */
 export const verifyUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  console.log("it comes here");
   const { authorization } = req.headers;
   if (!authorization) {
     next(new UnauthenticatedError("Access token required"));
@@ -70,7 +87,6 @@ export const verifyUser = async (
     return;
   }
   try {
-    console.log("it comes in try block");
     const playload = jwt.verify(token[1], config.jwt.secret!) as User;
 
     const user = await getUserById(playload.userId);

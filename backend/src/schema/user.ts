@@ -1,5 +1,9 @@
 import Joi from "joi";
 
+/**
+ * Schema for validating query parameters for getting users.
+ * @type {Joi.ObjectSchema}
+ */
 export const getUserQuerySchema = Joi.object({
   q: Joi.string().optional(),
   page: Joi.number()
@@ -25,6 +29,10 @@ export const getUserQuerySchema = Joi.object({
   stripUnknown: true,
 });
 
+/**
+ * Schema for validating the request body when creating a new user.
+ * @type {Joi.ObjectSchema}
+ */
 export const createUserBodySchema = Joi.object({
   name: Joi.string().required().messages({
     "any.required": "Name is required",
@@ -61,6 +69,10 @@ export const createUserBodySchema = Joi.object({
   stripUnknown: true,
 });
 
+/**
+ * Schema for validating path parameters.
+ * @type {Joi.ObjectSchema}
+ */
 export const paramSchema = Joi.object({
   id: Joi.required().messages({
     "any.required": "ID is required",

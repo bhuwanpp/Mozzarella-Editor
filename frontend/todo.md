@@ -1,21 +1,29 @@
 today
-[] if access token expired it log out in frontend
-[] video script
-[] responsive
-[] style class for similar styles
-[] docker
-[]when logout it text area vaule shown from index
-
-night
-[]when login it first file data shown of the file otherwise nothing show
-[] if there is no file show we can't write in textarea and if there is file show that file data
-[] full screen
-[] js logo in left side of file
-[] shortcut key
-[] pagination in frontend
-
-saturday and sunday
 [] js doc
+[] validate get user
+day
 [] testing
-[] file structure
-[] comment
+[] good function name
+[] spelling check
+[] remove any in ts in backend
+[] remove random number to constants in backend
+nasta
+[] practice presention
+[] code runner
+[] learn lsp
+[] learn autocomplete
+
+problem
+[] cursoer line number problem
+
+presentation
+[] code run
+[] auto complete
+[] error diagnostic
+[] lsp for backend
+[] file create for server
+
+learn
+[]lsp
+[] docker network
+[] backend

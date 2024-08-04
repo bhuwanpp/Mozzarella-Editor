@@ -1,62 +1,17 @@
-import io from "socket.io-client";
-import { resizeTextarea, updateHighlighting } from "../highlight";
+import { editor, suggestions } from ".";
+import { updateHighlighting } from "../highlight";
+import { ICompletionItem } from "../interface/lsp";
 import "../style.css";
+import { MovementDelta } from "../types/lsp";
 import { errorsDiv } from "./errors";
+export let selectedIndex = -1;
+export let currentCompletions: ICompletionItem[] = [];
 
-const socket = io("http://localhost:8080");
-const editor = document.getElementById("textarea") as HTMLTextAreaElement;
-const suggestions = document.getElementById("suggestions") as HTMLDivElement;
-let selectedIndex = -1;
-let currentCompletions: any[] = [];
-
-socket.on("connect", () => {
-  console.log("Connected to server");
-});
-
-editor.addEventListener("input", () => {
-  const code = editor.value;
-
-  updateHighlighting();
-  resizeTextarea();
-
-  if (code.length === 0) {
-    suggestions.style.display = "none";
-    return;
-  }
-  socket.emit("codeUpdate", code);
-});
-
-socket.on("completion", (data) => {
-  let entries;
-  if (Array.isArray(data)) {
-    entries = data;
-  } else if (data && Array.isArray(data.entries)) {
-    entries = data.entries;
-  } else {
-    console.error("Invalid completion data:", data);
-    return;
-  }
-  showSuggestions(entries);
-});
-
-editor.addEventListener("keydown", (e) => {
-  if (suggestions.style.display === "block") {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      moveSelection(1);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      moveSelection(-1);
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (selectedIndex >= 0 && selectedIndex < currentCompletions.length) {
-        applySuggestion(currentCompletions[selectedIndex].name);
-      }
-    }
-  }
-});
-
-function showSuggestions(completions: any) {
+/**
+ * Displays the completion suggestions in the suggestions box.
+ * @param {ICompletionItem[]} completions - The list of completion items to display.
+ */
+export function showSuggestions(completions: ICompletionItem) {
   if (!Array.isArray(completions)) {
     console.error("Received invalid completion data:", completions);
     return;
@@ -65,7 +20,7 @@ function showSuggestions(completions: any) {
   const code = editor.value.substring(0, cursorPosition);
   const lastWord = code.split(/\s|\./).pop() || "";
 
-  currentCompletions = completions.filter((item: any) =>
+  currentCompletions = completions.filter((item) =>
     item.name.toLowerCase().startsWith(lastWord.toLowerCase())
   );
 
@@ -76,10 +31,10 @@ function showSuggestions(completions: any) {
     return;
   }
 
-  currentCompletions.forEach((item: any, index: any) => {
+  currentCompletions.forEach((item, index) => {
     const div = document.createElement("div");
     div.textContent = `${item.name} (${item.kind})`;
-    div.dataset.index = index;
+    div.dataset.index = String(index);
     div.onclick = () => {
       applySuggestion(item.name);
     };
@@ -89,13 +44,16 @@ function showSuggestions(completions: any) {
   suggestions.style.display = "block";
 }
 
-function positionSuggestions() {
+/**
+ * Positions the suggestions box based on the editor's scroll and cursor position.
+ */
+export function positionSuggestions() {
   const rect = editor.getBoundingClientRect();
   const lineHeight = parseFloat(window.getComputedStyle(editor).lineHeight);
   const charWidth = 8;
   const offset = 45;
 
-  const lines = editor.value.substr(0, editor.selectionStart).split("\n");
+  const lines = editor.value.substring(0, editor.selectionStart).split("\n");
   const currentLineNumber = lines.length;
   const currentColumnNumber = lines[lines.length - 1].length;
 
@@ -108,7 +66,11 @@ function positionSuggestions() {
   suggestions.style.left = `${left}px`;
   suggestions.style.top = `${top}px`;
 }
-function moveSelection(delta: any) {
+/**
+ * Moves the selection of the suggestion box up or down.
+ * @param {MovementDelta} delta - The direction to move the selection. `-1` for up, `1` for down.
+ */
+export function moveSelection(delta: MovementDelta) {
   const items = suggestions.querySelectorAll("div");
   if (items.length === 0) return;
 
@@ -123,7 +85,11 @@ function moveSelection(delta: any) {
   });
 }
 
-function applySuggestion(name: string) {
+/**
+ * Applies the selected suggestion to the editor.
+ * @param {string} name - The name of the suggestion to apply.
+ */
+export function applySuggestion(name: string) {
   const currentValue = editor.value;
   const cursorPosition = editor.selectionStart;
   const beforeCursor = currentValue.substring(0, cursorPosition);
@@ -143,6 +109,7 @@ function applySuggestion(name: string) {
   const newCursorPosition = newValue.length - afterCursor.length;
   editor.setSelectionRange(newCursorPosition, newCursorPosition);
   editor.focus();
+
   // Hide suggestions
   suggestions.style.display = "none";
   currentCompletions = [];
@@ -154,22 +121,10 @@ function applySuggestion(name: string) {
   clearErrors();
 }
 
-function clearErrors() {
+/**
+ * Clears all displayed errors.
+ */
+export function clearErrors() {
   errorsDiv.style.display = "none";
   errorsDiv.innerHTML = "";
 }
-
-editor.addEventListener("input", positionSuggestions);
-editor.addEventListener("scroll", positionSuggestions);
-window.addEventListener("resize", positionSuggestions);
-editor.addEventListener("scroll", () => {
-  if (suggestions.style.display === "block") {
-    positionSuggestions();
-  }
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    suggestions.style.display = "none";
-  }
-});

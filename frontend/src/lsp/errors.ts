@@ -1,24 +1,15 @@
-import { textArea } from "../main";
+import { IDiagnosticError } from "../interface/lsp";
 
-import io from "socket.io-client";
-
-const socket = io("http://localhost:8080", { transports: ["websocket"] });
 export const errorsDiv = document.getElementById("errors") as HTMLDivElement;
 
-socket.on("connect", () => {
-  console.log("Connected to server");
-});
-
-textArea.addEventListener("input", () => {
-  const code = textArea.value;
-  socket.emit("codeUpdate", code);
-});
-
-socket.on("diagnostics", (diagnostics) => {
-  showErrors(diagnostics);
-});
-
-function showErrors(diagnostics: any) {
+/**
+ * Displays a list of error diagnostics in the `errorsDiv` element.
+ * The `errorsDiv` element is shown if there are any diagnostics and hidden if there are none.
+ * Each diagnostic error is displayed with its code, message, line, and column information.
+ *
+ * @param {IDiagnosticError[]} diagnostics - An array of diagnostic errors to display.
+ */
+export function showErrors(diagnostics: IDiagnosticError[]) {
   if (Object.keys(diagnostics).length >= 1) {
     errorsDiv.style.display = "block";
   } else {
@@ -33,7 +24,7 @@ function showErrors(diagnostics: any) {
     errorsDiv.style.display = "none";
   });
 
-  diagnostics.forEach((error: any) => {
+  diagnostics.forEach((error: IDiagnosticError) => {
     const errorDiv = document.createElement("div");
     errorDiv.textContent = `Error (${error.code}): ${error.text} at line ${error.start.line}, column ${error.start.offset}`;
     errorsDiv.appendChild(errorDiv);

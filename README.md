@@ -1,5 +1,7 @@
 # Mozzarella Editor
 
+![alt text](/frontend/public/images/readme.png)
+
 ### Description
 
 Mozzarella JS aims to provide an advanced online JavaScript code editor and compiler similar to online js compiler. It will enable users to write, compile, and execute JavaScript code directly within their web browsers.
@@ -39,28 +41,28 @@ Mozzarella JS aims to provide an advanced online JavaScript code editor and comp
 
 Quick Start
 
-1.  With Git Clone
+1. With Git Clone
 
-    - Clone the project:\
-      `git clone git@github.com:bhuwanpp/Mozzarella-Editor.git`
-    - Navigate to the project directory:\
-      `cd Mozzarella-Editor`
-    - Set up and start the backend:\
-       `cd backend`\
-      `npm install`\
-      `npm start`
-    - Set up and start the frontend:\
-      ` cd ../frontend`\
-      `npm install`\
-      `npm run dev`
+   - Clone the project:\
+     `git clone git@github.com:bhuwanpp/Mozzarella-Editor.git`
+   - Navigate to the project directory:\
+     `cd Mozzarella-Editor`
+   - Set up and start the backend:\
+      `cd backend`\
+     `npm install`\
+     `npm start`
+   - Set up and start the frontend:\
+     `cd ../frontend`\
+     `npm install`\
+     `npm run dev`
 
-2.  With docker
+2. With docker
 
-    - clone the project:\
-      `docker compose up -d`
+   - clone the project:\
+     `docker compose up -d`
 
-3.  With docker pull:\
-    `docker pull bhuwanluffy/mozzarella-editor`
+3. With docker pull:\
+   `docker pull bhuwanluffy/mozzarella-editor`
 
 ### Contributing
 

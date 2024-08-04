@@ -1,28 +1,41 @@
 import axios from "axios";
 import Prism from "prismjs";
 import { getAccessToken } from "../editor/fileOperations";
+import { IUserFile, IUserId, PaginationMeta } from "../interface/user";
 
-// show all user function
-export async function showAllUsersFunction() {
+let currentPage = 1;
+const usersPerPage = 10;
+
+/**
+ * Fetches and displays all users with pagination.
+ * @param {number} [page=1] - The page number to fetch.
+ */
+export async function showAllUsersFunction(page = 1) {
   const accessToken = getAccessToken();
   try {
-    const response = await axios.get("http://localhost:3000/users", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const users = response.data.data;
-    updateUserUI(users);
+    const response = await axios.get(
+      `http://localhost:3000/users?page=${page}&limit=${usersPerPage}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const { data: users, meta } = response.data;
+    updateUserUI(users, meta);
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
   }
 }
 
-// update  users
-async function updateUserUI(users: any[]) {
+/**
+ * Updates the UI to display the list of users and pagination controls.
+ * @param {IUserId[]} users - The list of users to display.
+ * @param {PaginationMeta} meta - Metadata for pagination.
+ */
+async function updateUserUI(users: IUserId[], meta: PaginationMeta) {
   const showUsersUI = document.getElementById("showUsersUI");
 
   if (showUsersUI) {
@@ -39,7 +52,21 @@ async function updateUserUI(users: any[]) {
             )
             .join("")}
         </ul>
+              <div class="pagination pt-10">
+        ${
+          meta.page > 1
+            ? `<button id="prevPage" class="bg-blue-400 px-2 py-1 rounded-md">Previous</button>`
+            : ""
+        }
+        <span>Page ${meta.page} of ${meta.totalPages}</span>
+        ${
+          meta.page < meta.totalPages
+            ? `<button id="nextPage" class="bg-blue-400 px-2 py-1 rounded-md">Next</button>`
+            : ""
+        }
+      </div>
       `;
+
     // Add event listeners to each list item
     const userItems = showUsersUI.querySelectorAll(".ulUsers");
     userItems.forEach((item) => {
@@ -55,17 +82,14 @@ async function updateUserUI(users: any[]) {
         }
       });
     });
+
     // Add event listeners to delete buttons
     const deleteButtons = showUsersUI.querySelectorAll(".delete-btn");
     deleteButtons.forEach((button) => {
-      button.addEventListener("click", async () => {
+      button.addEventListener("click", async (event) => {
         const userId = button.getAttribute("data-user-id");
+        event.stopPropagation();
         if (userId) {
-          if (userId === "2") {
-            alert("You cannot delete your own account.");
-            return;
-          }
-          // Show confirmation dialog
           const isConfirmed = window.confirm(
             "Are you sure you want to delete this user?"
           );
@@ -73,18 +97,44 @@ async function updateUserUI(users: any[]) {
           if (isConfirmed) {
             try {
               await deleteUser(userId);
-              showAllUsersFunction();
+              showAllUsersFunction(currentPage);
             } catch (error) {
+              alert("you cannot delete to self or admin");
               console.error("Error deleting user file:", error);
             }
           }
         }
       });
     });
+
+    // Pagination controls
+    const prevButton = document.getElementById("prevPage");
+    const nextButton = document.getElementById("nextPage");
+    if (prevButton) {
+      prevButton.addEventListener("click", () => {
+        if (currentPage > 1) {
+          currentPage--;
+          showAllUsersFunction(currentPage);
+        }
+      });
+    }
+    if (nextButton) {
+      nextButton.addEventListener("click", () => {
+        if (currentPage < meta.totalPages) {
+          currentPage++;
+          showAllUsersFunction(currentPage);
+        }
+      });
+    }
   }
 }
 
-// fetch user file
+/**
+ * Fetches the file data for a specific user.
+ * @param {string} userId - The ID of the user whose file is to be fetched.
+ * @returns {Promise<IUserFile>} The user's file data.
+ * @throws {Error} If the file fetch request fails.
+ */
 async function fetchUserFile(userId: string) {
   const accessToken = getAccessToken();
   try {
@@ -101,8 +151,12 @@ async function fetchUserFile(userId: string) {
   }
 }
 
-// escape html
-function escapeHtml(unsafe: any) {
+/**
+ * Escapes HTML special characters in a string to prevent XSS attacks.
+ * @param {string} unsafe - The string to escape.
+ * @returns {string} The escaped string.
+ */
+function escapeHtml(unsafe: string) {
   return unsafe
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -111,14 +165,17 @@ function escapeHtml(unsafe: any) {
     .replace(/'/g, "&#039;");
 }
 
-// display user file
-function displayUserFile(userFile: any) {
+/**
+ * Displays the content of a user's file.
+ * @param {IUserFile} userFile - The user's file data to display.
+ */
+function displayUserFile(userFile: IUserFile) {
   const showUsersUI = document.getElementById("showUsersUI");
 
   if (showUsersUI) {
     const fileContents = userFile.data
       .map(
-        (file: any) =>
+        (file) =>
           `<div>
           <h3 class = "pt-1"> file-name: ${file.fileName}</h3>
           <pre><code class="language-js pt-1"> file-code: ${escapeHtml(
@@ -140,7 +197,11 @@ function displayUserFile(userFile: any) {
   }
 }
 
-// delete user
+/**
+ * Deletes a user by their ID.
+ * @param {string} userId - The ID of the user to delete.
+ * @throws {Error} If the delete request fails.
+ */
 async function deleteUser(userId: string) {
   const accessToken = getAccessToken();
   try {
@@ -150,9 +211,7 @@ async function deleteUser(userId: string) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(`User  with ID ${userId} deleted successfully`);
   } catch (error) {
-    console.error("Error deleting user", error);
     throw error;
   }
 }

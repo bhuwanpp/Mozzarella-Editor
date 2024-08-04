@@ -4,42 +4,40 @@ import "prismjs/themes/prism.css";
 import "./style.css";
 
 const textarea = document.getElementById("textarea") as HTMLTextAreaElement;
-const highlightedCode = document.getElementById(
+export const highlightedCode = document.getElementById(
   "highlighted-code"
 ) as HTMLPreElement;
+const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
 
+/**
+ * Updates the syntax highlighting of the code in the textarea.
+ */
 export function updateHighlighting() {
-  const code = textarea.value;
+  let code = textarea.value;
   const highlightedHTML = Prism.highlight(
     code,
     Prism.languages.javascript,
     "javascript"
   );
   highlightedCode.innerHTML = highlightedHTML + "\n";
+
+  // Synchronize scroll position between the textarea and highlighted code
   highlightedCode.scrollTop = textarea.scrollTop;
   highlightedCode.scrollLeft = textarea.scrollLeft;
 }
 
+/**
+ * Adjusts the height of the textarea to fit its content.
+ */
 export function resizeTextarea() {
+  textarea.style.height = "auto";
   textarea.style.height = textarea.scrollHeight + "px";
 }
 
-textarea.addEventListener("input", () => {
-  updateHighlighting();
-  resizeTextarea();
-});
-
-textarea.addEventListener("scroll", function () {
-  highlightedCode.scrollTop = textarea.scrollTop;
-  highlightedCode.scrollLeft = textarea.scrollLeft;
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  updateHighlighting();
-});
-
-const highlightDiv = document.getElementById("highlight") as HTMLDivElement;
-const handleSelectionChange = () => {
+/**
+ * Updates the position and height of the highlight div based on the current selection.
+ */
+export const handleSelectionChange = () => {
   if (document.activeElement === textarea) {
     const start = textarea.selectionStart;
     const textBefore = textarea.value.substring(0, start);
@@ -53,6 +51,3 @@ const handleSelectionChange = () => {
     highlightDiv.style.height = `${lineHeight}px`;
   }
 };
-
-document.addEventListener("selectionchange", handleSelectionChange);
-textarea.addEventListener("input", handleSelectionChange);

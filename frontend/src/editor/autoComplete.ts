@@ -1,7 +1,11 @@
 import { resizeTextarea, updateHighlighting } from "../highlight";
 import { textArea } from "../main";
 
-export function astAutoComplete(event: any) {
+/**
+ * Automatically completes brackets and quotes when the user types an opening character.
+ * @param {KeyboardEvent} event - The keyboard event triggered by the user.
+ */
+export function astAutoComplete(event: KeyboardEvent) {
   const char = event.key;
 
   if (["(", "{", "[", '"', "'", "`"].includes(char)) {

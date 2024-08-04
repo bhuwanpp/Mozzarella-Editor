@@ -2,11 +2,26 @@ import fs from "fs/promises";
 import path from "path";
 import { IFile } from "../interfaces/file";
 
+/**
+ * Class to handle file operations for user-specific directories.
+ */
 export class FileModal {
+  /**
+   * Gets the directory path for user files.
+   * @param userId - The ID of the user.
+   * @returns The directory path as a string.
+   */
   private static getFilesDir(userId: string): string {
     return path.join(__dirname, `../code/${userId}`);
   }
 
+  /**
+   * Creates a new file for a specific user.
+   * @param fileName - The name of the file to create.
+   * @param userId - The ID of the user.
+   * @param fileData - The content to write into the file.
+   * @throws Will throw an error if file creation fails.
+   */
   static async createFile(fileName: string, userId: string, fileData: string) {
     const FILES_DIR = this.getFilesDir(userId);
 
@@ -22,6 +37,12 @@ export class FileModal {
     await fs.writeFile(filePath, fileData);
   }
 
+  /**
+   * Retrieves all files for a specific user.
+   * @param userId - The ID of the user.
+   * @returns A promise that resolves to an array of files.
+   * @throws Will throw an error if file reading fails.
+   */
   static async getFiles(userId: string): Promise<IFile[]> {
     const FILES_DIR = this.getFilesDir(userId);
 
@@ -48,6 +69,12 @@ export class FileModal {
     return files;
   }
 
+  /**
+   * Deletes a specific file for a user.
+   * @param fileName - The name of the file to delete.
+   * @param userId - The ID of the user.
+   * @throws Will throw an error if file deletion fails.
+   */
   static async deleteFile(fileName: string, userId: string): Promise<void> {
     const FILES_DIR = this.getFilesDir(userId);
     const filePath = path.join(FILES_DIR, fileName);
@@ -63,6 +90,13 @@ export class FileModal {
     }
   }
 
+  /**
+   * Renames a specific file for a user.
+   * @param oldFileName - The current name of the file.
+   * @param newFileName - The new name of the file.
+   * @param userId - The ID of the user.
+   * @throws Will throw an error if file renaming fails.
+   */
   static async renameFile(
     oldFileName: string,
     newFileName: string,

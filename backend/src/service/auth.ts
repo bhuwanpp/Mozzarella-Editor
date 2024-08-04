@@ -1,24 +1,36 @@
 import { default as bcript, default as bcrypt } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import config from "../config";
+import ConflictError from "../error/ConflictError";
 import NotFoundError from "../error/NotFoundError";
 import { User } from "../interfaces/user";
 import * as UserModel from "../model/user";
 import * as UserService from "../service/user";
-import ConflictError from "../error/ConflictError";
 
+/**
+ * Handles user signup by hashing the password and creating a new user if the email is not already taken.
+ * @param {User} user - The user information including email, name, and password.
+ * @returns {Promise<any>} The result of the user creation operation.
+ * @throws {ConflictError} If the email already exists in the database.
+ */
 export async function signup(user: User) {
   const password = await bcrypt.hash(user.password, 10);
   const existingUser = await UserModel.UserModel.getUserByEmail(user.email);
   if (existingUser) {
-    throw new ConflictError('Email already exists in database');
+    throw new ConflictError("Email already exists in database");
   }
   const data = await UserService.createUser({ ...user, password });
   return data;
 }
 
+/**
+ * Handles user login by checking the provided email and password, and generating tokens if the credentials are valid.
+ * @param {Pick<User, "email" | "password">} body - The login credentials including email and password.
+ * @returns {Promise<{ name: string; accessToken: string; refreshToken: string }>} The user's name and generated tokens.
+ * @throws {NotFoundError} If the user does not exist or the password is invalid.
+ */
 export async function login(body: Pick<User, "email" | "password">) {
-  console.log('it comes in service')
+  console.log("it comes in service");
   const existingUser = await UserModel.UserModel.getUserByEmail(body.email);
   console.log("service" + existingUser);
   if (!existingUser) {
@@ -42,16 +54,14 @@ export async function login(body: Pick<User, "email" | "password">) {
     expiresIn: config.jwt.acccessTokenExpiraryMS,
   });
 
-  const refresthToken = await sign(payload, config.jwt.secret!, {
+  const refreshToken = await sign(payload, config.jwt.secret!, {
     expiresIn: config.jwt.refreshTokenExpiraryMS,
   });
 
   const name = existingUser.name;
-  const roleId = existingUser.roleId;
   return {
     name,
-    roleId,
     accessToken,
-    refresthToken,
+    refreshToken,
   };
 }

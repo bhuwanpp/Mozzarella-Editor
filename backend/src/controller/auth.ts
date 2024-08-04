@@ -7,6 +7,13 @@ import loggerWithNameSpace from "../utils/logger";
 import HttpStatusCodes from "http-status-codes";
 const logger = loggerWithNameSpace("UserController");
 
+/**
+ * Handles user signup.
+ * @param {Request} req - The request object containing user signup details.
+ * @param {Response} res - The response object to send the result of the signup.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ * @returns {Promise<void>}
+ */
 export async function signup(req: Request, res: Response, next: NextFunction) {
   const { body } = req;
   const { email, password, role } = body;
@@ -33,11 +40,17 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       });
     }
   } catch (e) {
-    next(e)
+    next(e);
   }
-
 }
 
+/**
+ * Handles user login.
+ * @param {Request} req - The request object containing user login details.
+ * @param {Response} res - The response object to send the result of the login.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ * @returns {Promise<void>}
+ */
 export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = req;
@@ -50,6 +63,12 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+/**
+ * Refreshes the access token using the provided refresh token.
+ * @param {Request} req - The request object containing the authorization header with the refresh token.
+ * @param {Response} res - The response object to send the new access token and refresh token.
+ * @returns {Promise<void>}
+ */
 export async function refresh(req: Request, res: Response) {
   const { authorization } = req.headers;
 
@@ -69,7 +88,8 @@ export async function refresh(req: Request, res: Response) {
     return;
   }
 
-  verify(token[1], config.jwt.secret!, (error, data) => {
+  const refreshToken = token[1];
+  verify(refreshToken, config.jwt.secret!, (error, data) => {
     if (error) {
       res.status(HttpStatusCodes.NOT_FOUND).json({
         error: error.message,
@@ -78,9 +98,10 @@ export async function refresh(req: Request, res: Response) {
 
     if (typeof data !== "string" && data) {
       const payload = {
-        id: data.id,
+        userId: data.userId,
         name: data.name,
         email: data.email,
+        role: data.role,
       };
       // create new accessToken
       const accessToken = sign(payload, config.jwt.secret!);
